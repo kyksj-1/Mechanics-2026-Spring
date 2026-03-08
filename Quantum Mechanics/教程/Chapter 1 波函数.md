@@ -251,13 +251,13 @@ $$\Psi(x,0) = \begin{cases} A(a - |x|) & \text{if } |x| < a \\ 0 & \text{otherwi
 
 ### Key Takeaway: 1.2 统计诠释
 
-| 要点 | 内容 |
-|------|------|
-| **玻恩诠释** | $|\Psi(x,t)|^2$ 是概率密度 |
-| **概率计算** | $P(a \le x \le b) = \int_a^b |\Psi|^2 dx$ |
-| **三种立场** | 实在论（隐变量）、正统论（坍缩）、不可知论 |
-| **贝尔定理** | 排除了局域隐变量理论，支持量子力学的非定域性 |
-| **波函数坍缩** | 测量瞬间波函数突变，不能用薛定谔方程描述 |
+| 要点        | 内容                                     |
+| --------- | -------------------------------------- |
+| **玻恩诠释**  | $\Psi(x,t)^2$ 是概率密度                    |
+| **概率计算**  | $P(a \le x \le b) = \int_a^b\Psi^2 dx$ |
+| **三种立场**  | 实在论（隐变量）、正统论（坍缩）、不可知论                  |
+| **贝尔定理**  | 排除了局域隐变量理论，支持量子力学的非定域性                 |
+| **波函数坍缩** | 测量瞬间波函数突变，不能用薛定谔方程描述                   |
 
 ---
 
@@ -405,13 +405,12 @@ $$\sigma_x^2 = \langle x^2 \rangle - \langle x \rangle^2 = \sigma^2 + x_0^2 - x_
 
 ### Key Takeaway: 1.3 概率
 
-| 概念 | 离散情况 | 连续情况 |
-|------|----------|----------|
-| **概率** | $P(j_n)$ | $\rho(x) dx$ |
-| **归一化** | $\sum_n P(j_n) = 1$ | $\int \rho(x) dx = 1$ |
-| **期望值** | $\langle j \rangle = \sum_n j_n P(j_n)$ | $\langle x \rangle = \int x \rho(x) dx$ |
-| **方差** | $\sigma^2 = \langle j^2 \rangle - \langle j \rangle^2$ | $\sigma^2 = \langle x^2 \rangle - \langle x \rangle^2$ |
-| **量子力学** | — | $\rho(x) = |\Psi(x,t)|^2$ |
+| 概念      | 离散情况                                                   | 连续情况                                                   |
+| ------- | ------------------------------------------------------ | ------------------------------------------------------ |
+| **概率**  | $P(j_n)$                                               | $\rho(x) dx$                                           |
+| **归一化** | $\sum_n P(j_n) = 1$                                    | $\int \rho(x) dx = 1$                                  |
+| **期望值** | $\langle j \rangle = \sum_n j_n P(j_n)$                | $\langle x \rangle = \int x \rho(x) dx$                |
+| **方差**  | $\sigma^2 = \langle j^2 \rangle - \langle j \rangle^2$ | $\sigma^2 = \langle x^2 \rangle - \langle x \rangle^2$ |
 
 ---
 
@@ -560,14 +559,14 @@ $$\Psi(x,0) = Ae^{-ax^2}$$
 
 ### Key Takeaway: 1.4 归一化
 
-| 要点 | 内容 |
-|------|------|
-| **归一化条件** | $\int_{-\infty}^{\infty} |\Psi|^2 dx = 1$ |
-| **重新归一化** | $\Psi \to \Psi/\sqrt{N}$，其中 $N = \int |\Psi|^2 dx$ |
-| **概率守恒** | $\frac{d}{dt}\int |\Psi|^2 dx = 0$（需满足边界条件） |
+| 要点        | 内容                                                                                                                |
+| --------- | ----------------------------------------------------------------------------------------------------------------- |
+| **归一化条件** | $\int_{-\infty}^{\infty}\Psi^2 dx = 1$                                                                            |
+| **重新归一化** | $\Psi \to \Psi/\sqrt{N}$，其中 $N = \int\Psi^2 dx$                                                                   |
+| **概率守恒**  | $\frac{d}{dt}\int\Psi^2 dx = 0$（需满足边界条件）                                                                          |
 | **概率流密度** | $J = \frac{i\hbar}{2m}\left(\Psi\frac{\partial\Psi^*}{\partial x} - \Psi^*\frac{\partial\Psi}{\partial x}\right)$ |
-| **连续性方程** | $\frac{\partial|\Psi|^2}{\partial t} + \frac{\partial J}{\partial x} = 0$ |
-| **边界条件** | $|x| \to \infty$ 时 $\Psi \to 0$（平方可积） |
+| **连续性方程** | $\frac{\partial\Psi^2}{\partial t} + \frac{\partial J}{\partial x} = 0$                                           |
+| **边界条件**  | $x\to \infty$ 时 $\Psi \to 0$（平方可积）                                                                                |
 
 ---
 
@@ -613,7 +612,7 @@ $$\frac{d\langle x \rangle}{dt} = \frac{i\hbar}{2m} \left( -\int_{-\infty}^{\inf
 
 将上式重写：
 
-$$\frac{d\langle x \rangle}{dt} = \int_{-\infty}^{\infty} \Psi^* \left( \frac{\hbar}{i} \frac{\partial}{\partial x} \right) \Psi dx$$
+$$m\frac{d\langle x \rangle}{dt} = \int_{-\infty}^{\infty} \Psi^* \left( \frac{\hbar}{i} \frac{\partial}{\partial x} \right) \Psi dx$$
 
 在经典力学中，$\frac{dx}{dt} = v = \frac{p}{m}$，即 $p = m\frac{dx}{dt}$。类比地，我们定义：
 
@@ -940,17 +939,17 @@ flowchart TD
 
 ### 关键公式汇总
 
-| 公式名称 | 表达式 |
-|----------|--------|
-| 含时薛定谔方程 | $i\hbar \frac{\partial \Psi}{\partial t} = -\frac{\hbar^2}{2m} \frac{\partial^2 \Psi}{\partial x^2} + V\Psi$ |
-| 归一化条件 | $\int_{-\infty}^{\infty} |\Psi|^2 dx = 1$ |
-| 概率流密度 | $J = \frac{i\hbar}{2m}\left(\Psi\frac{\partial\Psi^*}{\partial x} - \Psi^*\frac{\partial\Psi}{\partial x}\right)$ |
-| 连续性方程 | $\frac{\partial|\Psi|^2}{\partial t} + \frac{\partial J}{\partial x} = 0$ |
-| 动量算符 | $\hat{p} = -i\hbar \frac{\partial}{\partial x}$ |
-| 期望值 | $\langle Q \rangle = \int \Psi^* \hat{Q} \Psi dx$ |
-| 方差 | $\sigma^2 = \langle Q^2 \rangle - \langle Q \rangle^2$ |
-| Ehrenfest 定理 | $\frac{d\langle p \rangle}{dt} = \langle -\frac{\partial V}{\partial x} \rangle$ |
-| 不确定性原理 | $\sigma_x \sigma_p \ge \frac{\hbar}{2}$ |
+| 公式名称         | 表达式                                                                                                               |
+| ------------ | ----------------------------------------------------------------------------------------------------------------- |
+| 含时薛定谔方程      | $i\hbar \frac{\partial \Psi}{\partial t} = -\frac{\hbar^2}{2m} \frac{\partial^2 \Psi}{\partial x^2} + V\Psi$      |
+| 归一化条件        | $\int_{-\infty}^{\infty}\Psi^2 dx = 1$                                                                            |
+| 概率流密度        | $J = \frac{i\hbar}{2m}\left(\Psi\frac{\partial\Psi^*}{\partial x} - \Psi^*\frac{\partial\Psi}{\partial x}\right)$ |
+| 连续性方程        | $\frac{\partial\Psi^2}{\partial t} + \frac{\partial J}{\partial x} = 0$                                           |
+| 动量算符         | $\hat{p} = -i\hbar \frac{\partial}{\partial x}$                                                                   |
+| 期望值          | $\langle Q \rangle = \int \Psi^* \hat{Q} \Psi dx$                                                                 |
+| 方差           | $\sigma^2 = \langle Q^2 \rangle - \langle Q \rangle^2$                                                            |
+| Ehrenfest 定理 | $\frac{d\langle p \rangle}{dt} = \langle -\frac{\partial V}{\partial x} \rangle$                                  |
+| 不确定性原理       | $\sigma_x \sigma_p \ge \frac{\hbar}{2}$                                                                           |
 
 ### 物理图景建立
 
@@ -1126,7 +1125,6 @@ for t in times:
 - 波包宽度 $\sigma_x(t) = \sigma_x(0)\sqrt{1 + (2a\hbar t/m)^2}$ 随时间增大——这就是**波包扩散**
 - 尽管波包扩散，总概率始终守恒（归一化不变）
 
----
 
 ---
 
