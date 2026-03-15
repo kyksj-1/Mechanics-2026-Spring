@@ -113,6 +113,8 @@ $$\boxed{\alpha = 4\pi\varepsilon_0 a^3 = 3\varepsilon_0 v}$$
 
 注意规律：碱金属（Li, Na, K, Cs）的极化率远大于惰性气体（He, Ne, Ar），这是因为碱金属的最外层电子只有一个，束缚较弱。Cs 的极化率最大，因为它的原子半径最大。
 
+> **从电介质到导体的统一视角**：导体可以看作极化率 $\alpha \to \infty$ 的极端情况。在导体中，电子是自由的（束缚为零），外电场可以引起无限大的"极化"——自由电荷持续移动，直到内部电场完全为零。换句话说，**导体就是极化率极大的物质**。这个视角将导体和电介质统一到同一个框架中：它们只是对外电场响应程度不同的材料，$\alpha$ 从有限值（电介质）连续过渡到无穷大（导体）。
+
 **分子极化率：各向异性**
 
 对于分子，情况更为复杂。由于分子的几何结构不是球对称的，沿不同方向施加电场，极化的程度可能不同。例如，CO$_2$ 分子沿轴向的极化率大于垂直方向。
@@ -183,6 +185,8 @@ $$\boxed{\mathbf{N} = \mathbf{p} \times \mathbf{E}}$$
 
 转矩的方向使 $\mathbf{p}$ 趋向于与 $\mathbf{E}$ 对齐。这就像指南针在磁场中转动一样——极性分子在电场中会"摆动"到与电场平行的方向。
 
+> **生活中的应用——微波炉的工作原理**：微波炉正是利用了极性分子的定向极化。微波炉发出频率约 $2.45\,\text{GHz}$ 的交变电磁场，水分子（强极性分子，$p \approx 6.1 \times 10^{-30}\,\text{C}\cdot\text{m}$）在快速交变的电场中被反复转动，分子间的摩擦将电场能量转化为热能，从而加热食物。这也解释了为什么微波炉能加热含水食物却几乎不加热干燥的陶瓷盘——陶瓷中缺少可以被交变电场驱动转动的极性分子。
+
 **偶极子在电场中的能量**
 
 将偶极子从与电场垂直的位置（$\theta = 90°$）转到角度 $\theta$ 所需的功为：
@@ -201,7 +205,21 @@ $$\boxed{U = -\mathbf{p} \cdot \mathbf{E}}$$
 
 $$\boxed{\mathbf{F} = \nabla(\mathbf{p} \cdot \mathbf{E})}$$
 
+> **等价形式**：利用矢量恒等式 $\nabla(\mathbf{p}\cdot\mathbf{E}) = (\mathbf{p}\cdot\nabla)\mathbf{E} + \mathbf{p}\times(\nabla\times\mathbf{E}) + (\mathbf{E}\cdot\nabla)\mathbf{p} + \mathbf{E}\times(\nabla\times\mathbf{p})$。对于理想偶极子，$\mathbf{p}$ 不依赖于位置（$\nabla$ 作用在 $\mathbf{p}$ 上为零）；在静电场中 $\nabla\times\mathbf{E} = 0$。因此上式简化为：
+>
+> $$\boxed{\mathbf{F} = (\mathbf{p}\cdot\nabla)\mathbf{E}} \qquad \text{（静电场中的等价形式）}$$
+>
+> 两种写法完全等价，但适用场景略有不同。$\nabla(\mathbf{p}\cdot\mathbf{E})$ 的形式在计算能量梯度时更自然（$\mathbf{F} = -\nabla U$，$U = -\mathbf{p}\cdot\mathbf{E}$）；$(\mathbf{p}\cdot\nabla)\mathbf{E}$ 的形式在直接展开分量计算时更方便。
+
 > **物理意义**：偶极子被吸引向电场**增强**的方向。这就是为什么碎纸片会被带电梳子吸引——梳子的电场在近处较强，碎纸片中的诱导偶极子被拉向梳子。
+
+**关于任意参考点的转矩**
+
+上面推导的 $\mathbf{N} = \mathbf{p}\times\mathbf{E}$ 是关于偶极子中心的转矩。如果选取其他参考点（位矢 $\mathbf{r}$），还需要加上净力的力矩贡献：
+
+$$\boxed{\mathbf{N} = \mathbf{p}\times\mathbf{E} + \mathbf{r}\times\mathbf{F}}$$
+
+在均匀场中 $\mathbf{F} = 0$，第二项消失，回到 $\mathbf{N} = \mathbf{p}\times\mathbf{E}$。但在非均匀场中，$\mathbf{F} = (\mathbf{p}\cdot\nabla)\mathbf{E} \neq 0$，参考点的选择会影响转矩的大小（但不影响物理运动——角动量定理中的转矩和角动量都相对同一参考点）。
 
 ---
 
@@ -1058,6 +1076,26 @@ plt.show()
 ### Griffiths 教材精选习题
 
 以下习题选自 Griffiths《Introduction to Electrodynamics》第五版，标注为 [G x.xx]。它们经过精选，与本章核心考点高度对齐。
+
+**[G 4.2]** 量子力学告诉我们，氢原子基态的电子云电荷密度为
+
+$$\rho(r) = \frac{q}{\pi a^3}e^{-2r/a}$$
+
+其中 $q$ 为电子电荷，$a$ 为玻尔半径。求这种原子的极化率。
+
+*提示*：先用高斯定律求出电子云的电场 $E_e(r)$，然后对指数函数展开，假设 $r \ll a$。
+
+*背景*：这是对 §4.1.2 中"均匀球"粗糙模型的量子力学修正。使用真实的氢原子波函数计算极化率，结果为 $\alpha = 3\cdot 4\pi\varepsilon_0 a^3 = \frac{3}{2}$ 倍于粗糙模型值，更接近实验数据。这道题也是课程作业题。
+
+**[G 4.8]** 证明两个理想偶极子 $\mathbf{p}_1$ 和 $\mathbf{p}_2$ 之间的相互作用能为
+
+$$U = \frac{1}{4\pi\varepsilon_0}\frac{1}{r^3}\left[\mathbf{p}_1\cdot\mathbf{p}_2 - 3(\mathbf{p}_1\cdot\hat{\mathbf{r}})(\mathbf{p}_2\cdot\hat{\mathbf{r}})\right]$$
+
+其中 $\mathbf{r}$ 是从 $\mathbf{p}_1$ 指向 $\mathbf{p}_2$ 的分离矢量。
+
+*提示*：利用偶极子在电场中的能量 $U = -\mathbf{p}\cdot\mathbf{E}$（习题4.7），以及第3章公式(3.104)给出的偶极子电场。
+
+*背景*：偶极-偶极相互作用是分子间范德瓦尔斯力的重要组成部分。注意 $U \propto 1/r^3$——比点电荷间的库仑能（$\propto 1/r$）衰减快得多。这道题也是课程作业题。
 
 **[G 4.10]** 一个半径为 $R$ 的球体，极化强度 $\mathbf{P}(\mathbf{r}) = k\mathbf{r}$（$k$ 为常数）。
 
