@@ -695,7 +695,7 @@ $$\langle x \rangle(t) = \langle x \rangle(0) + \frac{\langle p \rangle}{m} t$$
 
 证明：对于任意实势能 $V(x)$，有
 
-$$\frac{d\langle T \rangle}{dt} = -\frac{\hbar}{m} \text{Im} \int_{-\infty}^{\infty} \frac{\partial \Psi^*}{\partial x} \frac{\partial V}{\partial x} \Psi dx$$
+$$\frac{d\langle T \rangle}{dt} = \frac{\hbar}{m} \text{Im} \int_{-\infty}^{\infty} \frac{\partial \Psi^*}{\partial x} \frac{\partial V}{\partial x} \Psi dx$$
 
 其中 $\langle T \rangle$ 是动能期望值。
 
