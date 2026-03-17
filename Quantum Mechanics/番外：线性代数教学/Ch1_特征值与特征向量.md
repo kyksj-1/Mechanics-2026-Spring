@@ -104,7 +104,7 @@ $$
 \boxed{\det(A - \lambda I) = 0}
 $$
 
-这就是**特征方程**（characteristic equation）。展开行列式得到的是关于 $\lambda$ 的 $n$ 次多项式，称为**特征多项式**（characteristic polynomial）：
+这就是**特征方程**（characteristic equation）, 其解为 $\lambda_i$ 。展开行列式得到的是关于 $\lambda$ 的 $n$ 次多项式，称为**特征多项式**（characteristic polynomial）：
 
 $$
 p(\lambda) = \det(A - \lambda I) = (-1)^n \lambda^n + \cdots
@@ -351,7 +351,7 @@ $$
 **证明**：设 $Q\mathbf{v} = \lambda\mathbf{v}$。
 
 $$
-\|\mathbf{v}\|^2 = \mathbf{v}^T\mathbf{v} = (Q\mathbf{v})^T(Q\mathbf{v}) \cdot \frac{1}{|\lambda|^2} \cdot |\lambda|^2
+\|\mathbf{v}\|^2 = \mathbf{v}^T\mathbf{v} = (Q\mathbf{v})^T(Q\mathbf{v}) \cdot \frac{1}{|\lambda|^2}
 $$
 
 更直接地：$\|Q\mathbf{v}\|^2 = \mathbf{v}^T Q^T Q \mathbf{v} = \mathbf{v}^T \mathbf{v} = \|\mathbf{v}\|^2$
