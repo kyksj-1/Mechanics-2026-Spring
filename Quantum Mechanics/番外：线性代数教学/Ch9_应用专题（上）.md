@@ -1,4 +1,4 @@
-# 第9章 应用专题 (Applications)
+# 第9章 应用专题（上）：量子力学、优化与深度学习
 
 > **作者**：kyksj-1
 > **风格致敬**：Gilbert Strang × 3Blue1Brown
@@ -11,7 +11,7 @@
 
 > **这些工具在真实世界中究竟有什么用？**
 
-我们将穿越五大领域——量子力学、优化与输运、深度学习、金融、刚体力学——展示线性代数如何成为现代科学与工程的**通用语言**。
+我们将穿越五大领域——量子力学、优化与输运、深度学习、金融、刚体力学——展示线性代数如何成为现代科学与工程的**通用语言**。本篇（上）聚焦前三个领域，下篇聚焦金融与刚体力学，并给出全景总结。
 
 每个领域都给出**非入门级**的例子和完整的代码实现。
 
@@ -138,6 +138,148 @@ e^{-iHt/\hbar} = U \, \text{diag}(e^{-i\lambda_1 t/\hbar}, \ldots, e^{-i\lambda_
 $$
 
 这就是对角化在量子力学中的直接应用。
+
+### 9.1.5 双自旋耦合系统：4×4 矩阵的完整求解
+
+两个自旋-1/2 粒子通过交换相互作用耦合，Hamilton 量为：
+
+$$
+\hat{H} = J\,\boldsymbol{\sigma}_1 \cdot \boldsymbol{\sigma}_2 = J(\sigma_x^{(1)}\sigma_x^{(2)} + \sigma_y^{(1)}\sigma_y^{(2)} + \sigma_z^{(1)}\sigma_z^{(2)})
+$$
+
+其中 $J$ 是耦合常数。在 $\{|\uparrow\uparrow\rangle, |\uparrow\downarrow\rangle, |\downarrow\uparrow\rangle, |\downarrow\downarrow\rangle\}$ 基底下，用 Kronecker 积构造 $4 \times 4$ 矩阵：
+
+$$
+\sigma_x^{(1)}\sigma_x^{(2)} = \sigma_x \otimes \sigma_x = \begin{pmatrix} 0 & 0 & 0 & 1 \\ 0 & 0 & 1 & 0 \\ 0 & 1 & 0 & 0 \\ 1 & 0 & 0 & 0 \end{pmatrix}
+$$
+
+类似地计算 $\sigma_y \otimes \sigma_y$ 和 $\sigma_z \otimes \sigma_z$，求和得到：
+
+$$
+\boxed{H = J\begin{pmatrix} 1 & 0 & 0 & 0 \\ 0 & -1 & 2 & 0 \\ 0 & 2 & -1 & 0 \\ 0 & 0 & 0 & 1 \end{pmatrix}}
+$$
+
+**观察**：$H$ 是**块对角**的！$|\uparrow\uparrow\rangle$ 和 $|\downarrow\downarrow\rangle$ 各自是 $1 \times 1$ 块（不与其他态耦合），而 $|\uparrow\downarrow\rangle$ 和 $|\downarrow\uparrow\rangle$ 构成一个 $2 \times 2$ 块——这正是 Ch8 分块矩阵思想的体现。
+
+对 $2 \times 2$ 块 $\begin{pmatrix} -1 & 2 \\ 2 & -1 \end{pmatrix}$ 对角化，特征值为 $-3$ 和 $1$，特征向量为 $\frac{1}{\sqrt{2}}(|\uparrow\downarrow\rangle \mp |\downarrow\uparrow\rangle)$。
+
+**完整能谱**：
+
+| 态 | 能量 | 自旋量子数 $S$ | 简并度 | 物理名称 |
+|----|------|---------------|--------|---------|
+| $\frac{1}{\sqrt{2}}(|\uparrow\downarrow\rangle - |\downarrow\uparrow\rangle)$ | $-3J$ | $S=0$ | 1 | **单态**（singlet） |
+| $|\uparrow\uparrow\rangle, \frac{1}{\sqrt{2}}(|\uparrow\downarrow\rangle + |\downarrow\uparrow\rangle), |\downarrow\downarrow\rangle$ | $J$ | $S=1$ | 3 | **三重态**（triplet） |
+
+当 $J > 0$（反铁磁耦合），单态能量最低——两个自旋倾向于反平行排列。当 $J < 0$（铁磁耦合），三重态能量最低——自旋倾向于平行排列。
+
+> **深层联系**：单态/三重态的分裂正是量子力学中**交换对称性**的体现。$H$ 与总自旋算符 $\hat{S}^2$ 对易（可同时对角化），所以 $S$ 是好量子数。这就是 Ch2 "可同时对角化 $\Leftrightarrow$ 算符对易"的物理实例。
+
+```python
+import numpy as np
+
+def two_spin_system(J=1.0):
+    """
+    求解双自旋-1/2 耦合系统。
+
+    参数:
+        J: 耦合常数（J>0 反铁磁, J<0 铁磁）
+    """
+    # Pauli 矩阵
+    sx = np.array([[0, 1], [1, 0]], dtype=complex)
+    sy = np.array([[0, -1j], [1j, 0]], dtype=complex)
+    sz = np.array([[1, 0], [0, -1]], dtype=complex)
+    I2 = np.eye(2, dtype=complex)
+
+    # Kronecker 积构造 4x4 矩阵
+    H = J * (np.kron(sx, sx) + np.kron(sy, sy) + np.kron(sz, sz))
+
+    print(f"Hamilton 量 H (J={J}):")
+    print(np.round(H.real, 3))
+
+    # 对角化
+    eigenvalues, eigenvectors = np.linalg.eigh(H)
+    print(f"\n能量本征值: {eigenvalues.real}")
+
+    # 总自旋算符 S^2
+    S = [np.kron(s, I2) + np.kron(I2, s) for s in [sx, sy, sz]]
+    S2 = sum(Si @ Si for Si in S)
+
+    print(f"\n本征态分析:")
+    basis_labels = ['|↑↑>', '|↑↓>', '|↓↑>', '|↓↓>']
+    for i, (E, v) in enumerate(zip(eigenvalues, eigenvectors.T)):
+        s2_val = (v.conj() @ S2 @ v).real
+        S_quantum = (-1 + np.sqrt(1 + 4*s2_val)) / 2  # S(S+1) = s2_val
+        print(f"  E = {E.real:+.1f}J, S = {S_quantum:.0f}")
+        # 显示态的成分
+        components = []
+        for j, label in enumerate(basis_labels):
+            if abs(v[j]) > 0.01:
+                coeff = v[j]
+                if abs(coeff.imag) < 1e-10:
+                    components.append(f"{coeff.real:+.4f}{label}")
+                else:
+                    components.append(f"({coeff:.4f}){label}")
+        print(f"    |psi> = {' '.join(components)}")
+
+    # 时间演化：从 |↑↓> 出发
+    psi0 = np.array([0, 1, 0, 0], dtype=complex)
+    times = np.linspace(0, 2*np.pi / abs(J), 200)
+
+    print(f"\n时间演化: 从 |↑↓> 出发")
+    print(f"在 t = pi/(2J) 时，系统处于 |↓↑> 态（自旋翻转！）")
+
+    # 计算 <sigma_z^(1)>(t)
+    sz1 = np.kron(sz, I2)
+    sz1_expect = []
+    for t in times:
+        U = eigenvectors @ np.diag(np.exp(-1j * eigenvalues * t)) @ eigenvectors.T.conj()
+        psi_t = U @ psi0
+        sz1_expect.append((psi_t.conj() @ sz1 @ psi_t).real)
+
+    return times, sz1_expect
+
+
+times, sz1 = two_spin_system(J=1.0)
+```
+
+### 9.1.6 密度矩阵与量子纠缠
+
+当量子系统处于**混合态**（统计混合而非纯叠加）时，我们用**密度矩阵**描述：
+
+$$
+\rho = \sum_k p_k |\psi_k\rangle\langle\psi_k|
+$$
+
+密度矩阵的性质完全由线性代数决定：
+
+| 性质 | 数学表达 | 物理含义 |
+|------|---------|---------|
+| 厄米性 | $\rho^\dagger = \rho$ | 可观测量的期望值是实数 |
+| 正半定性 | $\rho \geq 0$ | 概率非负 |
+| 迹为 1 | $\text{tr}(\rho) = 1$ | 概率归一化 |
+| $\text{tr}(\rho^2) \leq 1$ | 等号当且仅当纯态 | **纯度**（purity）|
+
+对于双自旋系统中的 Bell 态（最大纠缠态）：
+
+$$
+|\Psi^-\rangle = \frac{1}{\sqrt{2}}(|\uparrow\downarrow\rangle - |\downarrow\uparrow\rangle)
+$$
+
+对第一个自旋取偏迹（partial trace），得到**约化密度矩阵**：
+
+$$
+\rho_1 = \text{tr}_2(|\Psi^-\rangle\langle\Psi^-|) = \frac{1}{2}I_2
+$$
+
+$\rho_1$ 是最大混合态（所有特征值相等）——这意味着单看第一个自旋，它是**完全随机**的。但整个双粒子系统是纯态！这种"部分比整体更无序"的现象就是**量子纠缠**的数学特征。
+
+**纠缠度量——von Neumann 熵**：
+
+$$
+\boxed{S(\rho) = -\text{tr}(\rho \ln \rho) = -\sum_k \lambda_k \ln \lambda_k}
+$$
+
+其中 $\lambda_k$ 是 $\rho$ 的特征值。$S = 0$ 对应纯态，$S = \ln d$ 对应最大混合态（$d$ 维空间中所有特征值相等）。
 
 ---
 
@@ -299,6 +441,140 @@ print(f"传输矩阵的形状: {T.shape}")
 print(f"传输矩阵的行和误差: {np.max(np.abs(T.sum(axis=1) - a)):.2e}")
 print(f"传输矩阵的列和误差: {np.max(np.abs(T.sum(axis=0) - b)):.2e}")
 ```
+
+### 9.2.4 条件数对梯度下降的定量影响
+
+考虑最简单的二次优化：$f(\mathbf{x}) = \frac{1}{2}\mathbf{x}^T A\mathbf{x} - \mathbf{b}^T\mathbf{x}$，其中 $A$ 对称正定。
+
+梯度下降的迭代：$\mathbf{x}_{k+1} = \mathbf{x}_k - \alpha \nabla f = \mathbf{x}_k - \alpha(A\mathbf{x}_k - \mathbf{b})$
+
+在最优步长 $\alpha^* = \frac{2}{\lambda_{\max} + \lambda_{\min}}$ 下，误差的收敛率为：
+
+$$
+\boxed{\frac{\|\mathbf{x}_{k+1} - \mathbf{x}^*\|}{\|\mathbf{x}_k - \mathbf{x}^*\|} \leq \frac{\kappa - 1}{\kappa + 1}}
+$$
+
+其中 $\kappa = \lambda_{\max}/\lambda_{\min}$ 是条件数。
+
+| 条件数 $\kappa$ | 每步误差缩减率 | 达到 $10^{-6}$ 精度所需步数 |
+|:-:|:-:|:-:|
+| 1 | 0 | 1（一步到位） |
+| 10 | 0.818 | 69 |
+| 100 | 0.980 | 691 |
+| 1000 | 0.998 | 6,908 |
+| $10^6$ | 0.999998 | $\sim 7 \times 10^6$ |
+
+**直觉**：条件数大 → 等高线是扁椭圆 → 梯度方向与最优方向差很远 → 走"锯齿形"路径，收敛缓慢。
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+def gradient_descent_quadratic(A, b, x0, n_steps=500, step_size=None):
+    """
+    对二次函数 f(x) = 0.5 x^T A x - b^T x 执行梯度下降。
+
+    参数:
+        A: 对称正定矩阵
+        b: 目标向量
+        x0: 初始点
+        n_steps: 迭代步数
+        step_size: 学习率（None 则自动选择最优步长）
+    返回:
+        trajectory: 迭代轨迹
+        errors: 误差序列
+    """
+    eigenvalues = np.linalg.eigvalsh(A)
+    if step_size is None:
+        step_size = 2.0 / (eigenvalues.max() + eigenvalues.min())
+
+    x_star = np.linalg.solve(A, b)
+    x = x0.copy()
+    trajectory = [x.copy()]
+    errors = [np.linalg.norm(x - x_star)]
+
+    for _ in range(n_steps):
+        grad = A @ x - b
+        x = x - step_size * grad
+        trajectory.append(x.copy())
+        errors.append(np.linalg.norm(x - x_star))
+
+    return np.array(trajectory), np.array(errors)
+
+
+# 比较不同条件数
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+
+for idx, kappa in enumerate([5, 50, 500]):
+    A = np.diag([1.0, kappa])
+    b = np.array([1.0, 1.0])
+    x0 = np.array([3.0, 3.0])
+
+    traj, errors = gradient_descent_quadratic(A, b, x0, n_steps=200)
+
+    ax = axes[idx]
+    # 等高线
+    x_star = np.linalg.solve(A, b)
+    xr = np.linspace(-1, 4, 100)
+    yr = np.linspace(-0.5, 4, 100)
+    X, Y = np.meshgrid(xr, yr)
+    Z = 0.5*(A[0,0]*X**2 + A[1,1]*Y**2) - b[0]*X - b[1]*Y
+    ax.contour(X, Y, Z, levels=20, cmap='Blues', alpha=0.5)
+
+    # 轨迹
+    ax.plot(traj[:, 0], traj[:, 1], 'r.-', markersize=2, lw=0.5, alpha=0.7)
+    ax.plot(x0[0], x0[1], 'ko', markersize=8)
+    ax.plot(x_star[0], x_star[1], 'g*', markersize=12)
+    ax.set_title(f'kappa = {kappa}\nSteps to 1e-3: {np.searchsorted(-errors[::-1], -1e-3)}')
+    ax.set_xlabel('x_1')
+    ax.set_ylabel('x_2')
+    ax.set_aspect('equal')
+
+plt.suptitle('Gradient Descent: Condition Number Effect', fontsize=14)
+plt.tight_layout()
+plt.savefig('ch9_condition_number_gd.png', dpi=150, bbox_inches='tight')
+plt.show()
+```
+
+### 9.2.5 预条件器：用线性代数加速优化
+
+**核心思想**：如果条件数大是收敛慢的根源，那就用一个**预条件矩阵** $P \approx A^{-1}$ 来"改善"条件数。
+
+预条件梯度下降：
+
+$$
+\mathbf{x}_{k+1} = \mathbf{x}_k - \alpha P\nabla f
+$$
+
+等价于对变量做替换 $\mathbf{y} = P^{-1/2}\mathbf{x}$，新问题的 Hessian 是 $P^{1/2}AP^{1/2}$。
+
+若 $P = A^{-1}$，新 Hessian 是单位矩阵——条件数为 1，**一步收敛**！但 $P = A^{-1}$ 的计算代价等同于直接求解……
+
+实际中使用的预条件器是"便宜但有效"的近似：
+
+| 预条件器 | $P$ 的形式 | 条件数改善 | 代价 |
+|---------|-----------|-----------|------|
+| 对角预条件 | $P = \text{diag}(A)^{-1}$ | 中等 | $O(n)$ |
+| 不完全 Cholesky | $P = (\tilde{L}\tilde{L}^T)^{-1}$ | 显著 | $O(n \cdot \text{nnz})$ |
+| 块对角预条件 | $P = \text{diag}(A_1, \ldots, A_k)^{-1}$ | 视块结构而定 | $O(n^3/k^2)$ |
+
+> **与 Ch7、Ch8 的联系**：Cholesky 预条件器来自 Ch7 的正定矩阵分解，块对角预条件器来自 Ch8 的分块思想。优化领域最前沿的预条件技术，本质上就是在用线性代数的工具改善线性代数的问题。
+
+### 9.2.6 约束优化与 KKT 条件
+
+带等式约束的优化 $\min f(\mathbf{x})$ s.t. $\mathbf{g}(\mathbf{x}) = 0$ 的 KKT 系统是一个**鞍点系统**：
+
+$$
+\begin{pmatrix} H & J^T \\ J & 0 \end{pmatrix}\begin{pmatrix} \delta\mathbf{x} \\ \boldsymbol{\lambda} \end{pmatrix} = -\begin{pmatrix} \nabla f + J^T\boldsymbol{\lambda} \\ \mathbf{g} \end{pmatrix}
+$$
+
+其中 $J$ 是约束的 Jacobi 矩阵。这个系数矩阵是**不定**的（有正有负特征值），但具有特殊的块结构——Ch8 的 Schur 补在这里大显身手：
+
+$$
+S = -JH^{-1}J^T
+$$
+
+消去 $\delta\mathbf{x}$ 后，只需在约束空间中求解一个关于 $\boldsymbol{\lambda}$ 的小规模系统。
 
 ---
 
@@ -520,103 +796,157 @@ Sigma_0 = np.array([[5.0, 2.0, 0.5],
 diffusion_covariance_analysis(Sigma_0)
 ```
 
----
+### 9.3.4 权重矩阵的奇异值与梯度爆炸/消失
 
-## 9.4 关系总览与综合 SOP
+深度网络可以看作一连串矩阵乘法。对于 $L$ 层的线性网络（忽略激活函数）：
 
-### 9.4.1 跨领域概念映射
+$$
+\mathbf{y} = W_L W_{L-1} \cdots W_1 \mathbf{x}
+$$
 
-```mermaid
-flowchart TD
-    subgraph Core["线性代数核心"]
-        EIG["特征值/特征向量"]
-        DIAG["对角化"]
-        QF["二次型"]
-        PD["正定性"]
-        ORTH["正交性"]
-    end
+反向传播中的梯度也是矩阵连乘：
 
-    subgraph QM["量子力学"]
-        OBS["可观测量 = Hermitian"]
-        MEAS["测量值 = 特征值"]
-        STATE["本征态 = 特征向量"]
-        COMM["对易 = 同时对角化"]
-    end
+$$
+\frac{\partial \mathcal{L}}{\partial \mathbf{x}} = W_1^T W_2^T \cdots W_L^T \frac{\partial \mathcal{L}}{\partial \mathbf{y}}
+$$
 
-    subgraph OPT["优化"]
-        HESS["Hessian = 二次型"]
-        CONV["凸性 = 正定"]
-        COND["条件数 = 优化难度"]
-        NEWTON["Newton法 = H^(-1) grad"]
-    end
+设每层权重矩阵的最大奇异值为 $\sigma_{\max}(W_k)$，则：
 
-    subgraph DL["深度学习"]
-        ATTN["注意力 = 相似度矩阵"]
-        LOSS["损失地形 = Hessian谱"]
-        DIFF["扩散 = 协方差演化"]
-    end
+$$
+\left\|\frac{\partial \mathcal{L}}{\partial \mathbf{x}}\right\| \leq \prod_{k=1}^{L} \sigma_{\max}(W_k) \cdot \left\|\frac{\partial \mathcal{L}}{\partial \mathbf{y}}\right\|
+$$
 
-    subgraph FIN["金融"]
-        COV["协方差 = 风险"]
-        PORT["投资组合 = 二次优化"]
-        PCAF["PCA = 因子分析"]
-    end
+- 若所有 $\sigma_{\max} > 1$：梯度随层数**指数增长**（梯度爆炸）
+- 若所有 $\sigma_{\max} < 1$：梯度随层数**指数衰减**（梯度消失）
+- 理想情况：$\sigma_{\max} \approx 1$——这就是为什么**正交初始化**（$W$ 初始为正交矩阵）效果好
 
-    subgraph MECH["力学"]
-        INER["惯性张量 = 对称正定"]
-        STAB["稳定性 = 特征值符号"]
-        MODE["简正模态 = 特征向量"]
-    end
+$$
+\boxed{\text{梯度稳定} \iff \sigma_{\max}(W_k) \approx 1, \;\forall k}
+$$
 
-    EIG --> MEAS
-    EIG --> STAB
-    DIAG --> COMM
-    DIAG --> MODE
-    QF --> HESS
-    QF --> COV
-    PD --> CONV
-    PD --> INER
-    ORTH --> STATE
-    ORTH --> PCAF
-    ORTH --> ATTN
+**谱归一化**（Spectral Normalization）正是基于这个观察：将每层权重除以其最大奇异值，强制 $\sigma_{\max} = 1$。这在 GAN 训练中广泛使用。
 
-    style Core fill:#e3f2fd
-    style QM fill:#e8f5e9
-    style OPT fill:#fff3e0
-    style DL fill:#f3e5f5
-    style FIN fill:#fce4ec
-    style MECH fill:#e0f7fa
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+def analyze_gradient_flow(weight_matrices, input_dim=100, n_trials=50):
+    """
+    分析多层网络中梯度的传播行为。
+
+    参数:
+        weight_matrices: 权重矩阵列表 [W_1, W_2, ..., W_L]
+        input_dim: 输入维度
+        n_trials: 随机试验次数
+    """
+    L = len(weight_matrices)
+    grad_norms = np.zeros((n_trials, L + 1))
+
+    for trial in range(n_trials):
+        # 模拟反向传播
+        g = np.random.randn(weight_matrices[-1].shape[0])
+        g /= np.linalg.norm(g)
+        grad_norms[trial, L] = np.linalg.norm(g)
+
+        for k in range(L - 1, -1, -1):
+            g = weight_matrices[k].T @ g
+            grad_norms[trial, k] = np.linalg.norm(g)
+
+    # 计算每层的最大奇异值
+    singular_values = [np.linalg.svd(W, compute_uv=False)[0]
+                       for W in weight_matrices]
+
+    return grad_norms, singular_values
+
+
+# 比较三种初始化策略
+d = 100
+L = 20
+
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+strategies = {
+    'Too large (sigma_max > 1)': lambda: np.random.randn(d, d) * 1.5 / np.sqrt(d),
+    'Orthogonal (sigma_max = 1)': lambda: np.linalg.qr(np.random.randn(d, d))[0],
+    'Too small (sigma_max < 1)': lambda: np.random.randn(d, d) * 0.5 / np.sqrt(d),
+}
+
+for idx, (name, init_fn) in enumerate(strategies.items()):
+    Ws = [init_fn() for _ in range(L)]
+    grads, svs = analyze_gradient_flow(Ws)
+
+    ax = axes[idx]
+    # 梯度范数的中位数和分位数
+    median = np.median(grads, axis=0)
+    q25, q75 = np.percentile(grads, [25, 75], axis=0)
+    layers = np.arange(L + 1)
+
+    ax.semilogy(L - layers, median, 'b-', lw=2)
+    ax.fill_between(L - layers, q25, q75, alpha=0.3)
+    ax.set_xlabel('Layer (from output to input)')
+    ax.set_ylabel('Gradient norm (log scale)')
+    ax.set_title(f'{name}\nmax sigma_1 = {max(svs):.2f}')
+    ax.set_ylim(1e-10, 1e10)
+
+plt.suptitle(f'Gradient Flow in {L}-Layer Network (d={d})', fontsize=14)
+plt.tight_layout()
+plt.savefig('ch9_gradient_flow.png', dpi=150, bbox_inches='tight')
+plt.show()
 ```
 
-### 9.4.2 问题解决 SOP
+### 9.3.5 Batch Normalization 的线性代数本质
 
-面对一个实际问题，线性代数的使用流程：
+**Batch Normalization** 的核心操作是对每个 mini-batch 的激活值进行**白化**（whitening）——即使其均值为零、协方差为单位矩阵。
 
-```mermaid
-flowchart TD
-    P["实际问题"] --> M["建模为矩阵/算符"]
-    M --> Q{"矩阵的性质?"}
-    Q -->|对称/Hermitian| S1["正交对角化"]
-    Q -->|正定| S2["Cholesky / 能量分析"]
-    Q -->|一般方阵| S3["对角化 / Jordan"]
-    Q -->|非方阵| S4["SVD"]
+简化版本（忽略可学习参数 $\gamma, \beta$）：
 
-    S1 --> A1["谱分析: 特征值含义"]
-    S2 --> A2["优化: 凸性, 条件数"]
-    S3 --> A3["动力系统: 稳定性"]
-    S4 --> A4["降维: PCA / 最小二乘"]
+$$
+\hat{\mathbf{x}} = \Sigma^{-1/2}(\mathbf{x} - \boldsymbol{\mu})
+$$
 
-    A1 --> R["解释物理/工程含义"]
-    A2 --> R
-    A3 --> R
-    A4 --> R
-```
+其中 $\boldsymbol{\mu}$ 和 $\Sigma$ 是 mini-batch 的均值和协方差。
+
+**为什么这能加速训练？**
+
+1. **条件数改善**：白化后的 Hessian 条件数趋向 1（回顾 9.2.5 预条件器的思想）
+2. **去除特征间相关性**：$\Sigma^{-1/2}$ 就是对角化 + 缩放，使各方向的曲率一致
+3. **Internal Covariate Shift**：每层的输入分布不再剧烈变化
+
+实际的 BatchNorm 只做**逐通道**归一化（对角元素），而不是完整的白化（需要求 $\Sigma^{-1/2}$），因为完整白化的计算代价太高。但其思想根源是线性代数中的**协方差对角化**。
+
+### 9.3.6 低秩近似与模型压缩
+
+训练好的神经网络，其权重矩阵往往具有**近似低秩**结构——大部分奇异值接近零。
+
+SVD 分解 $W = U\Sigma V^T$，保留前 $r$ 个奇异值：
+
+$$
+W \approx W_r = U_r \Sigma_r V_r^T
+$$
+
+将一个 $m \times n$ 的全连接层替换为两个小矩阵的乘积：
+- $U_r\Sigma_r$：$m \times r$
+- $V_r^T$：$r \times n$
+
+参数量从 $mn$ 降至 $r(m+n)$。当 $r \ll \min(m,n)$ 时，压缩比显著。
+
+**LoRA**（Low-Rank Adaptation）就是这个思想的升级版：微调大模型时，不修改原始权重 $W_0$，只学习一个低秩增量 $\Delta W = BA$（$B \in \mathbb{R}^{m \times r}, A \in \mathbb{R}^{r \times n}$），参数量从 $mn$ 降至 $r(m+n)$。
 
 ---
 
-## 9.5-9.7 金融、刚体力学与高维推广
+## 9.4 上篇 Key Takeaway
 
-> 详见附录文件或后续更新。
+| 领域 | 核心矩阵/算符 | 关键线性代数操作 | 物理/工程意义 |
+|------|-------------|----------------|-------------|
+| 量子力学 | 厄米矩阵 $\hat{A}$ | 谱分解 | 测量值 = 特征值，本征态 = 特征向量 |
+| 量子力学 | 密度矩阵 $\rho$ | 偏迹、特征值分解 | 纠缠度量、纯度 |
+| 量子力学 | Kronecker 积 $H_1 \otimes I + I \otimes H_2$ | 块对角化 | 复合系统分解 |
+| 优化 | Hessian $H = \nabla^2 f$ | 特征值分析 | 条件数 → 收敛速度 |
+| 优化 | 预条件矩阵 $P$ | $P \approx H^{-1}$ | 改善条件数 → 加速优化 |
+| 优化 | KKT 鞍点系统 | Schur 补 | 约束消元 |
+| 深度学习 | 注意力矩阵 | 行随机矩阵、谱分析 | 自适应加权 |
+| 深度学习 | 权重矩阵 $W$ | SVD, 奇异值分析 | 梯度稳定性、模型压缩 |
+| 深度学习 | Hessian 谱 | 特征值分布 | 损失地形结构 |
+| 深度学习 | 协方差 $\Sigma_t$ | 凸组合、对角化 | 扩散过程的信息流 |
 
 ---
 
@@ -628,7 +958,7 @@ flowchart TD
 
 **9.2** 在优化问题中，"条件数"和"收敛速度"是什么关系？用二次函数 $f(\mathbf{x}) = \frac{1}{2}\mathbf{x}^TA\mathbf{x}$ 给出定量分析。
 
-**9.3** Transformer 中的注意力矩阵是行随机矩阵。证明行随机矩阵的最大特征值为 1，对应特征向量为 $\mathbf{1}$。
+**9.3** Transformer 中的注意力矩阵是行随机矩阵。证明行随机矩阵的最大特征值为 1，对应的右特征向量为 $\mathbf{1}$。
 
 ### 计算练习
 
@@ -642,26 +972,38 @@ flowchart TD
   - 画出相图（编程）
   - 求 Lyapunov 函数
 
+**9.6** 对双自旋耦合 Hamilton 量 $H = J(\boldsymbol{\sigma}_1 \cdot \boldsymbol{\sigma}_2)$：
+  - 用 Kronecker 积显式构造 $4 \times 4$ 矩阵
+  - 求解全部本征值和本征态
+  - 验证 $[H, \hat{S}^2] = 0$（$H$ 与总自旋算符对易）
+  - 如果初始态为 $|\uparrow\downarrow\rangle$，求 $t = \pi/(2J)$ 时的态
+
 ### 思考题
 
-**9.6** 扩散模型中，为什么协方差矩阵的条件数随扩散步数趋向 1？这对"去噪"过程意味着什么？
+**9.7** 扩散模型中，为什么协方差矩阵的条件数随扩散步数趋向 1？这对"去噪"过程意味着什么？
 
-**9.7** 比较三种方法的适用场景：特征值分解、Cholesky 分解、SVD。各自最擅长解决什么类型的问题？
+（提示：考虑 $\text{Cov}(\mathbf{x}_t) = \bar{\alpha}_t \Sigma_0 + (1-\bar{\alpha}_t)I$ 的特征值在 $\bar{\alpha}_t \to 0$ 时的行为。）
+
+**9.8** 比较三种加速梯度下降的策略：(a) 动量法, (b) 预条件（对角预条件）, (c) Newton 法。从条件数改善的角度分析它们各自的优势和代价。
+
+**9.9** 解释为什么 LoRA（Low-Rank Adaptation）能有效地微调大语言模型。从权重矩阵的谱结构出发，说明低秩假设的合理性。
+
+（提示：训练好的权重矩阵通常有快速衰减的奇异值。微调只需调整少数几个主要方向。）
 
 ### 编程题
 
-**9.8** 实现一个完整的 Markowitz 投资组合优化器：
-  - 模拟 5 只资产 500 天的收益率（含相关性）
-  - 计算协方差矩阵，分析其特征值（主成分 = 风险因子）
-  - 求解有效前沿（至少 20 个点）
-  - 可视化：有效前沿、各资产位置、最小方差组合
+**9.10** 实现一个完整的量子态演化模拟器：
+  - 构造 Heisenberg 自旋链 $H = J\sum_{i=1}^{N-1}\boldsymbol{\sigma}_i \cdot \boldsymbol{\sigma}_{i+1}$（$N = 6$）
+  - 从 Neel 态 $|\uparrow\downarrow\uparrow\downarrow\uparrow\downarrow\rangle$ 出发，模拟时间演化
+  - 计算并绘制每个位置的 $\langle\sigma_z^{(i)}\rangle(t)$ 随时间的演化（类似"自旋波传播"）
+  - 计算第一个自旋的约化密度矩阵和 von Neumann 熵的时间演化
 
-**9.9** 模拟 Euler 方程（刚体无力矩旋转）：
-  - 选取三个不同的主转动惯量 $I_1 < I_2 < I_3$
-  - 分别给出绕三个主轴附近的初始角速度
-  - 用 `scipy.integrate.solve_ivp` 数值求解
-  - 展示中间轴不稳定性（Tennis Racket 定理）
+**9.11** 梯度流分析实验：
+  - 构造一个 $L = 30$ 层、每层 $d = 50$ 的线性网络
+  - 分别用 (a) 正态初始化 $W_{ij} \sim \mathcal{N}(0, 2/d)$, (b) 正交初始化, (c) 谱归一化后的正态初始化
+  - 绘制每层梯度范数（从输出层到输入层），比较三种策略
+  - 进一步：如果加入 ReLU 激活函数，结论如何变化？
 
 ---
 
-> **下一章预告**：高维空间中的线性代数有什么新的现象？维数灾难如何影响计算？随机矩阵理论告诉我们什么？第10章将探讨高维推广。
+> **下篇预告**：金融中的投资组合优化、刚体力学中的 Tennis Racket 定理，以及五大领域的全景联系图——详见第9章（下）。
