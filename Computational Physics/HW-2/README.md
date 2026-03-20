@@ -14,7 +14,11 @@
   - [A.1 离散傅里叶变换 (DFT)](#a1-离散傅里叶变换-dft)
   - [A.2 Base-2 快速傅里叶变换 (FFT)](#a2-base-2-快速傅里叶变换-fft)
   - [A.3 信号频域分析](#a3-信号频域分析)
-- [B. 牛顿迭代法](#b-牛顿迭代法)（待完成）
+- [B. 牛顿迭代法](#b-牛顿迭代法)
+  - [B.1 方程的根](#b1-方程的根)
+  - [B.2 牛顿迭代递推公式](#b2-牛顿迭代递推公式)
+  - [B.3 Newton 分形 — 全局视图](#b3-newton-分形--全局视图)
+  - [B.4 Newton 分形 — 放大与自相似性](#b4-newton-分形--放大与自相似性)
 
 ---
 
@@ -28,11 +32,13 @@ HW-2/
 ├── src/
 │   ├── dft.py             # DFT / IDFT 核心算法
 │   ├── fft.py             # Base-2 FFT / IFFT 核心算法 (Cooley-Tukey)
-│   └── signal_analysis.py # 信号加载、频谱计算、峰值检测
+│   ├── signal_analysis.py # 信号加载、频谱计算、峰值检测
+│   └── newton.py          # 牛顿迭代法核心算法与分形计算
 ├── scripts/
 │   ├── run_dft_test.py         # A.1 DFT 验证与可视化
 │   ├── run_fft_benchmark.py    # A.2 FFT 基准测试与复杂度分析
-│   └── run_signal_analysis.py  # A.3 波形信号频域分析
+│   ├── run_signal_analysis.py  # A.3 波形信号频域分析
+│   └── run_newton_fractal.py   # B.3/B.4 Newton 分形可视化
 ├── data/
 │   └── waveform.dat       # 示波器采集的电压信号数据
 ├── output/                # 运行脚本自动生成的图片（不入库）
@@ -55,6 +61,9 @@ python scripts/run_fft_benchmark.py
 
 # A.3 信号分析
 python scripts/run_signal_analysis.py
+
+# B. 牛顿分形
+python scripts/run_newton_fractal.py
 ```
 
 依赖: `numpy`, `matplotlib`, `pyyaml`
@@ -223,7 +232,92 @@ FFT 后发现 **4 个显著的频率分量**，全部位于低频区域：
 
 ## B. 牛顿迭代法
 
-（待后续会话完成）
+### B.1 方程的根
+
+求解 $f(z) = z^3 - 1 = 0$。
+
+$z^3 = 1$ 的解是 **三次单位根**（unit roots of order 3），在复平面上均匀分布在单位圆上，相邻根之间夹角 $120°$：
+
+$$r_0 = 1, \quad r_1 = e^{2\pi i/3} = -\frac{1}{2} + \frac{\sqrt{3}}{2}i, \quad r_2 = e^{4\pi i/3} = -\frac{1}{2} - \frac{\sqrt{3}}{2}i$$
+
+可以验证：$z^3 - 1 = (z - r_0)(z - r_1)(z - r_2)$。
+
+---
+
+### B.2 牛顿迭代递推公式
+
+对于一般函数 $f(z)$，**牛顿迭代法**的递推公式为：
+
+$$\boxed{z_{n+1} = z_n - \frac{f(z_n)}{f'(z_n)}}$$
+
+几何直觉：在 $z_n$ 处用切线近似 $f$，取切线的零点作为下一步的估计。
+
+对于 $f(z) = z^3 - 1$，$f'(z) = 3z^2$，代入得到具体的递推公式：
+
+$$z_{n+1} = z_n - \frac{z_n^3 - 1}{3z_n^2} = \frac{2z_n^3 + 1}{3z_n^2}$$
+
+**关键实现 (`src/newton.py`):** `newton_step_z3()` 函数对整个网格向量化执行上式，对 $|f'(z)| < 10^{-15}$ 的点做除零保护。
+
+---
+
+### B.3 Newton 分形 — 全局视图
+
+#### 问题
+
+在以 $(0, 0)$ 为中心、半宽为 1 的正方形区域内，以分辨率 0.002 对每个初始点 $z_0 = x + iy$ 执行牛顿迭代，观察其收敛到哪个根。
+
+#### 结果
+
+网格 $1001 \times 1001 = 1{,}002{,}001$ 个点，最大迭代 100 次。
+
+![Newton 分形全局](output/b3_newton_fractal_global.png)
+
+**左图**为根归属图（红=r0、绿=r1、蓝=r2），**右图**为迭代次数热力图（亮色=收敛慢，暗色=收敛快）。
+
+迭代次数着色版本（亮度 $\propto$ 收敛速度）：
+
+![Newton 分形着色](output/b3_newton_fractal_shaded.png)
+
+**观察：**
+- 复平面被分成三个 **吸引盆** (basins of attraction)，分别收敛到三个根。
+- 每个吸引盆的大部分区域中，初始点仅需 5~10 次迭代即可收敛。
+- 三个吸引盆的边界不是光滑曲线，而是呈现复杂的 **分形结构**。
+- 边界上的点需要大量迭代才能收敛（迭代次数热力图中的亮线），甚至可能不收敛。
+- 整体结构具有 $120°$ 旋转对称性，反映了三个根在单位圆上的对称分布。
+
+---
+
+### B.4 Newton 分形 — 放大与自相似性
+
+#### B.4a 放大到 (-0.8, 0.0) 附近
+
+区域：以 $(-0.8, 0.0)$ 为中心，半宽 $0.25$，分辨率 $0.0005$。
+
+![B.4a 放大](output/b4a_newton_fractal_zoom1_shaded.png)
+
+#### B.4b 放大到 (-0.56, 0.18) 附近
+
+区域：以 $(-0.56, 0.18)$ 为中心，半宽 $0.1$，分辨率 $0.0002$。
+
+![B.4b 放大](output/b4b_newton_fractal_zoom2_shaded.png)
+
+#### 发现的有趣现象
+
+1. **自相似性 (Self-similarity)：** 这是分形最核心的特征。无论放大到什么尺度，我们都能观察到与全局图形相同的三叶花结构不断重复。B.4a 中可以看到和全局图完全一致的"花瓣"形状；B.4b 进一步放大后，每个小花瓣内部又包含更小的三叶结构——"递归式"地无限嵌套。
+
+2. **分形边界 (Fractal boundary)：** 三个吸引盆的边界是 Julia 集的一部分，具有非整数的 Hausdorff 维数。边界不是光滑的（甚至不是可微的），而是处处"锯齿状"——**任意两个吸引盆的边界上，总能找到第三个吸引盆的点**。换言之，三个区域的边界完全重合，这一性质由 Shishikura 于 1990 年代严格证明。
+
+3. **混沌敏感性：** 在分形边界附近，初始点的微小偏移就可能导致收敛到完全不同的根。这是确定性混沌的经典表现——迭代映射本身完全确定，但结果对初始条件极端敏感。
+
+4. **迭代次数在边界处发散：** 从迭代次数热力图可以看到，边界处的点需要远多于内部点的迭代次数。在精确的边界上（Julia 集），牛顿迭代永远不会收敛到任何根。
+
+#### 额外可视化：迭代轨迹
+
+![迭代轨迹](output/b_extra_iteration_trajectory.png)
+
+图中展示了 4 个不同初始点的牛顿迭代轨迹。可以看到：
+- 远离边界的点（如 $z_0 = -0.8$）几乎直线收敛到最近的根。
+- 靠近边界的点（如 $z_0 = -0.5 + 0.1i$）轨迹曲折，可能"跳过"最近的根而收敛到远处的根。
 
 ---
 
@@ -243,7 +337,10 @@ FFT 后发现 **4 个显著的频率分量**，全部位于低频区域：
   - [A.1 Discrete Fourier Transform (DFT)](#a1-discrete-fourier-transform-dft)
   - [A.2 Base-2 Fast Fourier Transform (FFT)](#a2-base-2-fast-fourier-transform-fft)
   - [A.3 Signal Frequency Analysis](#a3-signal-frequency-analysis)
-- [B. Newton's Method](#b-newtons-method) (To be completed)
+- [B. Newton's Method](#b-newtons-method)
+  - [B.1 Roots of the Equation](#b1-roots-of-the-equation)
+  - [B.2 Newton Iteration Formula](#b2-newton-iteration-formula)
+  - [B.3/B.4 Newton Fractal](#b3b4-newton-fractal)
 
 ---
 
@@ -257,11 +354,13 @@ HW-2/
 ├── src/
 │   ├── dft.py             # DFT / IDFT core algorithms
 │   ├── fft.py             # Base-2 FFT / IFFT (Cooley-Tukey)
-│   └── signal_analysis.py # Signal loading, spectrum computation, peak detection
+│   ├── signal_analysis.py # Signal loading, spectrum computation, peak detection
+│   └── newton.py          # Newton's method & fractal computation
 ├── scripts/
 │   ├── run_dft_test.py         # A.1 DFT verification & visualization
 │   ├── run_fft_benchmark.py    # A.2 FFT benchmarking & complexity analysis
-│   └── run_signal_analysis.py  # A.3 Waveform frequency-domain analysis
+│   ├── run_signal_analysis.py  # A.3 Waveform frequency-domain analysis
+│   └── run_newton_fractal.py   # B.3/B.4 Newton fractal visualization
 ├── data/
 │   └── waveform.dat       # Oscilloscope voltage signal data
 ├── output/                # Auto-generated figures (not tracked by git)
@@ -323,4 +422,19 @@ $$X[k] = E[k] + W_N^k \cdot O[k], \quad X[k+N/2] = E[k] - W_N^k \cdot O[k]$$
 
 ## B. Newton's Method
 
-(To be completed in a later session)
+### B.1 Roots of the Equation
+
+$f(z) = z^3 - 1 = 0$ has three roots — the **cube roots of unity**: $r_0 = 1$, $r_1 = e^{2\pi i/3}$, $r_2 = e^{4\pi i/3}$, equally spaced at $120°$ on the unit circle.
+
+### B.2 Newton Iteration Formula
+
+$$z_{n+1} = z_n - \frac{f(z_n)}{f'(z_n)} = z_n - \frac{z_n^3 - 1}{3z_n^2} = \frac{2z_n^3 + 1}{3z_n^2}$$
+
+### B.3/B.4 Newton Fractal
+
+Coloring each initial point $z_0$ by which root the iteration converges to reveals the **Newton fractal** — a classic example of deterministic chaos. Key findings:
+
+1. **Self-similarity:** The same three-petal structure repeats at every zoom level (confirmed by B.4a and B.4b).
+2. **Fractal boundary:** The basin boundaries have non-integer Hausdorff dimension. On any boundary between two basins, points from all three basins are always present (Shishikura's theorem).
+3. **Sensitive dependence on initial conditions:** Near the boundary, an infinitesimal change in $z_0$ can send the iteration to a completely different root.
+4. **Divergent iteration count at boundaries:** The Julia set (exact boundary) consists of points where Newton's method never converges.
