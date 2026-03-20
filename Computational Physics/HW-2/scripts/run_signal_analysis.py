@@ -212,15 +212,26 @@ def main() -> None:
     # 使用 matplotlib 内置的 specgram 函数
     Pxx, freqs_spec, bins_spec, im = ax_spec.specgram(
         voltage_arr,
-        NFFT=1024,      # 每段 FFT 的点数
+        NFFT=1024,      # 每段 FFT 的点数（频率分辨率 ≈ fs/NFFT ≈ 0.98 Hz）
         Fs=fs,           # 采样率
-        noverlap=512,    # 重叠点数
+        noverlap=512,    # 重叠点数（50% 重叠）
         cmap="viridis",
     )
     ax_spec.set_title("时频分析 (Spectrogram)", fontsize=14, fontweight="bold")
     ax_spec.set_xlabel("时间 (s)")
     ax_spec.set_ylabel("频率 (Hz)")
-    ax_spec.set_ylim(0, 500)  # 仅显示 0~500 Hz
+    # 信号分量集中在 1/3/5/7 Hz，将 y 轴聚焦到信号区域以清晰显示各谐波条带
+    ax_spec.set_ylim(0, 15)
+    # 在各谐波频率处添加参考虚线，便于对照
+    for harmonic_freq in [1, 3, 5, 7]:
+        ax_spec.axhline(
+            y=harmonic_freq, color="white", linestyle="--",
+            linewidth=0.8, alpha=0.7,
+        )
+        ax_spec.text(
+            0.3, harmonic_freq + 0.3, f"{harmonic_freq} Hz",
+            color="white", fontsize=9, fontweight="bold", alpha=0.9,
+        )
     fig2.colorbar(im, ax=ax_spec, label="功率谱密度 (dB/Hz)")
 
     plt.tight_layout()
