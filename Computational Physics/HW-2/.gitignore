@@ -1,0 +1,28 @@
+# 计算物理 HW-2 .gitignore
+
+# Python 缓存
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# 输出目录（图片等生成物不入库）
+output/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 虚拟环境
+.env/
+.venv/
+
+# 禁止提交的文件
+CLAUDE.md
