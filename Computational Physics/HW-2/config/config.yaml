@@ -1,0 +1,24 @@
+# ============================================================
+# 动态配置文件 - 可按需调整的运行时参数
+# ============================================================
+
+# --- DFT / FFT 基准测试配置 ---
+benchmark:
+  # FFT 基准测试的数组大小指数范围: 2^min_power ~ 2^max_power
+  min_power: 4
+  max_power: 12
+  # 每个大小重复测试次数（取中位数以减少噪声）
+  n_repeats: 5
+  # 随机数种子（可复现）
+  seed: 42
+
+# --- 信号分析配置 (A.3) ---
+signal_analysis:
+  # 是否对频谱取绝对值后再绘图
+  plot_magnitude: true
+  # 频谱图的频率上限 (Hz)，null 表示自动（Nyquist 频率）
+  freq_upper_limit: null
+  # 是否保存图片到 output/
+  save_figures: true
+  # 图片 DPI
+  figure_dpi: 150
