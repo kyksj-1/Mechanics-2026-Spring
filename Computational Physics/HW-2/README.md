@@ -1,11 +1,5 @@
 # 计算物理 Homework 2: FFT & 牛顿法
 
-> 作者: kyksj-1
-> 日期: 2026-03-20
-> 许可证: MIT License
-
----
-
 ## 目录
 
 - [项目结构](#项目结构)
@@ -41,32 +35,11 @@ HW-2/
 │   └── run_newton_fractal.py   # B.3/B.4 Newton 分形可视化
 ├── data/
 │   └── waveform.dat       # 示波器采集的电压信号数据
-├── output/                # 运行脚本自动生成的图片（不入库）
+├── output/                # 运行脚本自动生成的图片
 ├── ProbSet_2.md           # 题目原文
 └── README.md              # 本文件
 ```
 
----
-
-## 环境与运行
-
-```bash
-conda activate research_env
-
-# A.1 DFT 验证
-python scripts/run_dft_test.py
-
-# A.2 FFT 基准测试
-python scripts/run_fft_benchmark.py
-
-# A.3 信号分析
-python scripts/run_signal_analysis.py
-
-# B. 牛顿分形
-python scripts/run_newton_fractal.py
-```
-
-依赖: `numpy`, `matplotlib`, `pyyaml`
 
 ---
 
@@ -319,122 +292,3 @@ $$z_{n+1} = z_n - \frac{z_n^3 - 1}{3z_n^2} = \frac{2z_n^3 + 1}{3z_n^2}$$
 - 远离边界的点（如 $z_0 = -0.8$）几乎直线收敛到最近的根。
 - 靠近边界的点（如 $z_0 = -0.5 + 0.1i$）轨迹曲折，可能"跳过"最近的根而收敛到远处的根。
 
----
-
-# Computational Physics Homework 2: FFT & Newton's Method
-
-> Author: kyksj-1
-> Date: 2026-03-20
-> License: MIT License
-
----
-
-## Table of Contents
-
-- [Project Structure](#project-structure)
-- [Environment & Execution](#environment--execution)
-- [A. DFT and FFT](#a-dft-and-fft-1)
-  - [A.1 Discrete Fourier Transform (DFT)](#a1-discrete-fourier-transform-dft)
-  - [A.2 Base-2 Fast Fourier Transform (FFT)](#a2-base-2-fast-fourier-transform-fft)
-  - [A.3 Signal Frequency Analysis](#a3-signal-frequency-analysis)
-- [B. Newton's Method](#b-newtons-method)
-  - [B.1 Roots of the Equation](#b1-roots-of-the-equation)
-  - [B.2 Newton Iteration Formula](#b2-newton-iteration-formula)
-  - [B.3/B.4 Newton Fractal](#b3b4-newton-fractal)
-
----
-
-## Project Structure
-
-```
-HW-2/
-├── config/
-│   ├── config.py          # Static path configuration
-│   └── config.yaml        # Runtime parameters (benchmark repeats, seed, plot settings)
-├── src/
-│   ├── dft.py             # DFT / IDFT core algorithms
-│   ├── fft.py             # Base-2 FFT / IFFT (Cooley-Tukey)
-│   ├── signal_analysis.py # Signal loading, spectrum computation, peak detection
-│   └── newton.py          # Newton's method & fractal computation
-├── scripts/
-│   ├── run_dft_test.py         # A.1 DFT verification & visualization
-│   ├── run_fft_benchmark.py    # A.2 FFT benchmarking & complexity analysis
-│   ├── run_signal_analysis.py  # A.3 Waveform frequency-domain analysis
-│   └── run_newton_fractal.py   # B.3/B.4 Newton fractal visualization
-├── data/
-│   └── waveform.dat       # Oscilloscope voltage signal data
-├── output/                # Auto-generated figures (not tracked by git)
-├── ProbSet_2.md           # Problem set
-└── README.md              # This file
-```
-
----
-
-## Environment & Execution
-
-```bash
-conda activate research_env
-
-# A.1 DFT verification
-python scripts/run_dft_test.py
-
-# A.2 FFT benchmark
-python scripts/run_fft_benchmark.py
-
-# A.3 Signal analysis
-python scripts/run_signal_analysis.py
-```
-
-Dependencies: `numpy`, `matplotlib`, `pyyaml`
-
----
-
-## A. DFT and FFT
-
-### A.1 Discrete Fourier Transform (DFT)
-
-**Algorithm:** Implemented directly from the DFT definition $X[k] = \sum_{n=0}^{N-1} x[n] \cdot e^{-2\pi i nk/N}$, vectorized as a matrix-vector product $\mathbf{X} = \mathbf{W}\mathbf{x}$ where $W_{kn} = e^{-2\pi ikn/N}$. Complexity: $O(N^2)$.
-
-**Key implementation detail (`src/dft.py`):** The exponent matrix is constructed via `np.outer(k, n)` to avoid explicit double loops.
-
-**Verification:** All test cases (N = 8, 16, 32, 64, 128) pass with maximum absolute error below $10^{-10}$ when compared to `numpy.fft.fft`.
-
-### A.2 Base-2 Fast Fourier Transform (FFT)
-
-**Algorithm:** Cooley-Tukey radix-2 decimation-in-time (DIT), recursive implementation. Splits the DFT into even/odd-indexed sub-problems and merges via the butterfly operation:
-
-$$X[k] = E[k] + W_N^k \cdot O[k], \quad X[k+N/2] = E[k] - W_N^k \cdot O[k]$$
-
-**Complexity:** $O(N\log N)$. Recurrence: $T(N) = 2T(N/2) + O(N)$, yielding $N\log_2 N$ complex multiply-adds across $\log_2 N$ recursion levels.
-
-**Results:** All sizes from $2^4$ to $2^{12}$ pass correctness verification. The Python implementation is ~50-800x slower than numpy (due to interpreter overhead vs. compiled C/FFTPACK), but the log-log slope confirms $O(N\log N)$ scaling.
-
-### A.3 Signal Frequency Analysis
-
-**Finding:** The waveform is a **square wave** (fundamental frequency 1 Hz) plus white noise. Evidence:
-
-1. Only **odd harmonics** present: 1, 3, 5, 7 Hz
-2. Amplitudes follow the $1/n$ pattern: 1.000, 0.334, 0.201, 0.144 (matching the Fourier series $\frac{4}{\pi}\sum \frac{1}{n}\sin(n\omega_0 t)$)
-3. Flat broadband noise floor across the spectrum
-4. Stationary signal (confirmed by spectrogram)
-
----
-
-## B. Newton's Method
-
-### B.1 Roots of the Equation
-
-$f(z) = z^3 - 1 = 0$ has three roots — the **cube roots of unity**: $r_0 = 1$, $r_1 = e^{2\pi i/3}$, $r_2 = e^{4\pi i/3}$, equally spaced at $120°$ on the unit circle.
-
-### B.2 Newton Iteration Formula
-
-$$z_{n+1} = z_n - \frac{f(z_n)}{f'(z_n)} = z_n - \frac{z_n^3 - 1}{3z_n^2} = \frac{2z_n^3 + 1}{3z_n^2}$$
-
-### B.3/B.4 Newton Fractal
-
-Coloring each initial point $z_0$ by which root the iteration converges to reveals the **Newton fractal** — a classic example of deterministic chaos. Key findings:
-
-1. **Self-similarity:** The same three-petal structure repeats at every zoom level (confirmed by B.4a and B.4b).
-2. **Fractal boundary:** The basin boundaries have non-integer Hausdorff dimension. On any boundary between two basins, points from all three basins are always present (Shishikura's theorem).
-3. **Sensitive dependence on initial conditions:** Near the boundary, an infinitesimal change in $z_0$ can send the iteration to a completely different root.
-4. **Divergent iteration count at boundaries:** The Julia set (exact boundary) consists of points where Newton's method never converges.

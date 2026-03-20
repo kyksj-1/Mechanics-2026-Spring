@@ -6,8 +6,8 @@ __pycache__/
 *$py.class
 *.pyo
 
-# 输出目录（图片等生成物不入库）
-output/
+# PDF
+*.pdf
 
 # Jupyter
 .ipynb_checkpoints/
