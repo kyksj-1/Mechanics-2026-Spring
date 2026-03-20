@@ -106,78 +106,92 @@ def main() -> None:
     # --- 子图1: 完整时域波形 ---
     ax1 = fig.add_subplot(3, 2, 1)
     ax1.plot(time_arr, voltage_arr, color="steelblue", linewidth=0.3, alpha=0.8)
-    ax1.set_title("完整时域波形")
+    ax1.set_title("完整时域波形 (40s)")
     ax1.set_xlabel("时间 (s)")
     ax1.set_ylabel("电压 (V)")
     ax1.grid(True, alpha=0.3)
 
-    # --- 子图2: 时域波形局部放大 (前 0.5s) ---
+    # --- 子图2: 时域波形局部放大 (前 5s, 约 5 个完整周期) ---
     ax2 = fig.add_subplot(3, 2, 2)
-    mask_zoom = time_arr <= 0.5
+    mask_zoom = time_arr <= 5.0
     ax2.plot(time_arr[mask_zoom], voltage_arr[mask_zoom],
              color="steelblue", linewidth=0.5)
-    ax2.set_title("时域波形 (前 0.5s 局部放大)")
+    ax2.set_title("时域波形 (前 5s, 约 5 个基频周期)")
     ax2.set_xlabel("时间 (s)")
     ax2.set_ylabel("电压 (V)")
     ax2.grid(True, alpha=0.3)
 
-    # --- 子图3: 完整频谱 (线性坐标) ---
+    # --- 子图3: 频谱 — 信号区域 (0 ~ 15 Hz) ---
     ax3 = fig.add_subplot(3, 2, 3)
-    ax3.plot(freqs, magnitude, color="crimson", linewidth=0.5)
-    # 标注主要频率
-    for f_val, m_val in zip(dom_freqs[:5], dom_mags[:5]):
-        ax3.annotate(
-            f"{f_val:.1f} Hz",
-            xy=(f_val, m_val),
-            xytext=(f_val + 10, m_val * 1.1),
-            fontsize=8,
-            arrowprops=dict(arrowstyle="->", color="black", lw=0.8),
-            color="black",
-        )
-    ax3.set_title("频谱 (线性坐标)")
+    sig_mask = freqs <= 15
+    ax3.plot(freqs[sig_mask], magnitude[sig_mask], color="crimson", linewidth=1.2)
+    # 用茎叶图 (stem) 标注主要频率峰，使其更醒目
+    for f_val, m_val in zip(dom_freqs, dom_mags):
+        if f_val <= 15:
+            ax3.plot(f_val, m_val, "o", color="darkred", markersize=7, zorder=5)
+            ax3.annotate(
+                f"{f_val:.0f} Hz\n(A={m_val:.3f})",
+                xy=(f_val, m_val),
+                xytext=(f_val + 0.8, m_val - 0.06),
+                fontsize=9, fontweight="bold", color="darkred",
+                arrowprops=dict(arrowstyle="->", color="darkred", lw=1.0),
+            )
+    ax3.set_title("频谱 — 信号区域 (0~15 Hz)")
     ax3.set_xlabel("频率 (Hz)")
     ax3.set_ylabel("归一化幅值")
+    ax3.set_ylim(-0.02, 1.1)
     ax3.grid(True, alpha=0.3)
 
-    # --- 子图4: 频谱 (对数坐标) ---
+    # --- 子图4: 频谱 (dB 标度, 0~500 Hz) ---
     ax4 = fig.add_subplot(3, 2, 4)
-    # 避免 log(0)，给 magnitude 加一个极小值
     magnitude_db = 20 * np.log10(magnitude + 1e-15)
     ax4.plot(freqs, magnitude_db, color="darkgreen", linewidth=0.5)
-    ax4.set_title("频谱 (dB 标度)")
+    # 标注主要峰
+    for f_val, m_val in zip(dom_freqs, dom_mags):
+        db_val = 20 * np.log10(m_val + 1e-15)
+        ax4.plot(f_val, db_val, "v", color="red", markersize=6, zorder=5)
+    ax4.set_title("频谱 (dB 标度, 全频段)")
     ax4.set_xlabel("频率 (Hz)")
     ax4.set_ylabel("幅值 (dB)")
     ax4.grid(True, alpha=0.3)
 
-    # --- 子图5: 频谱低频区域放大 (0 ~ 100 Hz) ---
+    # --- 子图5: 与方波傅里叶级数的理论比较 ---
     ax5 = fig.add_subplot(3, 2, 5)
-    low_freq_mask = freqs <= 100
-    ax5.plot(freqs[low_freq_mask], magnitude[low_freq_mask],
-             color="darkorange", linewidth=1.0)
-    # 标注低频区域的主要频率
-    for f_val, m_val in zip(dom_freqs, dom_mags):
-        if f_val <= 100:
-            ax5.axvline(x=f_val, color="red", linestyle="--", alpha=0.5, linewidth=0.8)
-            ax5.text(f_val + 0.5, m_val * 0.9, f"{f_val:.1f} Hz",
-                     fontsize=8, color="red")
-    ax5.set_title("低频区域放大 (0 ~ 100 Hz)")
-    ax5.set_xlabel("频率 (Hz)")
-    ax5.set_ylabel("归一化幅值")
-    ax5.grid(True, alpha=0.3)
+    # 理论方波谐波: A_n = (4/pi) * (1/n), n = 1, 3, 5, 7, ...
+    theory_n = np.array([1, 3, 5, 7, 9, 11, 13])
+    theory_amp = 1.0 / theory_n  # 归一化到基频=1
+    # 实测幅值 (归一化到基频=1)
+    measured_amp = dom_mags / dom_mags[0] if len(dom_mags) > 0 else np.array([])
+    measured_n = dom_freqs / dom_freqs[0] if len(dom_freqs) > 0 else np.array([])
 
-    # --- 子图6: 频谱高频区域 (100 ~ 500 Hz) ---
+    bar_width = 0.35
+    x_pos = np.arange(len(theory_n))
+    ax5.bar(x_pos - bar_width/2, theory_amp[:len(theory_n)], bar_width,
+            color="steelblue", alpha=0.8, label="理论 (1/n)")
+    # 只画有实测数据的谐波
+    n_measured = min(len(measured_amp), len(theory_n))
+    ax5.bar(x_pos[:n_measured] + bar_width/2, measured_amp[:n_measured], bar_width,
+            color="coral", alpha=0.8, label="实测")
+    ax5.set_xticks(x_pos)
+    ax5.set_xticklabels([f"{int(n)}f0" for n in theory_n])
+    ax5.set_title("谐波幅值: 实测 vs 方波理论 (1/n)")
+    ax5.set_xlabel("谐波次数")
+    ax5.set_ylabel("归一化幅值 (基频=1)")
+    ax5.legend(fontsize=10)
+    ax5.grid(True, alpha=0.3, axis="y")
+
+    # --- 子图6: 噪声本底分析 (10 ~ 500 Hz) ---
     ax6 = fig.add_subplot(3, 2, 6)
-    high_freq_mask = (freqs >= 100) & (freqs <= 500)
-    ax6.plot(freqs[high_freq_mask], magnitude[high_freq_mask],
-             color="purple", linewidth=1.0)
-    for f_val, m_val in zip(dom_freqs, dom_mags):
-        if 100 <= f_val <= 500:
-            ax6.axvline(x=f_val, color="red", linestyle="--", alpha=0.5, linewidth=0.8)
-            ax6.text(f_val + 1, m_val * 0.9, f"{f_val:.1f} Hz",
-                     fontsize=8, color="red")
-    ax6.set_title("高频区域 (100 ~ 500 Hz)")
+    noise_mask = freqs >= 10
+    ax6.plot(freqs[noise_mask], magnitude[noise_mask],
+             color="purple", linewidth=0.5, alpha=0.7)
+    noise_floor = np.median(magnitude[noise_mask])
+    ax6.axhline(y=noise_floor, color="red", linestyle="--", linewidth=1.5,
+                label=f"噪声中位值 = {noise_floor:.4f}")
+    ax6.set_title("噪声本底 (10~500 Hz, 信号峰之外)")
     ax6.set_xlabel("频率 (Hz)")
     ax6.set_ylabel("归一化幅值")
+    ax6.legend(fontsize=10)
     ax6.grid(True, alpha=0.3)
 
     plt.tight_layout()
