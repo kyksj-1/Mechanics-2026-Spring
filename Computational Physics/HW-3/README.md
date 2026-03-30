@@ -9,39 +9,27 @@
 
 取 $\theta$ 作为广义坐标（摆偏离 $y$ 轴负方向的角度），向下为 $\theta=0$，向上 $\theta=\pi$。
 摆锤的坐标为：
-$$
-x = l \sin \theta \\
-y = a \cos(\omega t) - l \cos \theta
-$$
+$$x = l \sin \theta \\
+y = a \cos(\omega t) - l \cos \theta$$
 对其求导，得到速度的平方：
-$$
-\dot{x}^2 + \dot{y}^2 = l^2 \dot{\theta}^2 - 2 a l \omega \sin(\omega t) \sin\theta \, \dot{\theta} + a^2 \omega^2 \sin^2(\omega t)
-$$
+$$\dot{x}^2 + \dot{y}^2 = l^2 \dot{\theta}^2 - 2 a l \omega \sin(\omega t) \sin\theta \, \dot{\theta} + a^2 \omega^2 \sin^2(\omega t)$$
 因此，系统的拉格朗日量 $L = T - V$ 为：
-$$
-L = \frac{1}{2} m \left[ l^2 \dot{\theta}^2 - 2 a l \omega \sin(\omega t) \sin\theta \, \dot{\theta} + a^2 \omega^2 \sin^2(\omega t) \right] - mg(a \cos\omega t - l \cos\theta)
-$$
+$$L = \frac{1}{2} m \left[ l^2 \dot{\theta}^2 - 2 a l \omega \sin(\omega t) \sin\theta \, \dot{\theta} + a^2 \omega^2 \sin^2(\omega t) \right] - mg(a \cos\omega t - l \cos\theta)$$
 应用欧拉-拉格朗日方程 $\frac{d}{dt} \left( \frac{\partial L}{\partial \dot{\theta}} \right) - \frac{\partial L}{\partial \theta} = 0$ 进行推导：
 1. $\frac{\partial L}{\partial \dot{\theta}} = m l^2 \dot{\theta} - m a l \omega \sin(\omega t) \sin\theta$
 2. $\frac{d}{dt} \left( \frac{\partial L}{\partial \dot{\theta}} \right) = m l^2 \ddot{\theta} - m a l \omega^2 \cos(\omega t) \sin\theta - m a l \omega \sin(\omega t) \cos\theta \dot{\theta}$
 3. $\frac{\partial L}{\partial \theta} = - m a l \omega \sin(\omega t) \cos\theta \dot{\theta} - mgl \sin \theta$
 
 两者相减后化简得到系统的运动方程：
-$$
-m l^2 \ddot{\theta} - m a l \omega^2 \cos(\omega t) \sin\theta + mgl \sin \theta = 0
-$$
+$$m l^2 \ddot{\theta} - m a l \omega^2 \cos(\omega t) \sin\theta + mgl \sin \theta = 0$$
 化简得到角加速度：
-$$
-\ddot{\theta} = - \left( \frac{g}{l} - \frac{a \omega^2}{l} \cos(\omega t) \right) \sin \theta
-$$
+$$\ddot{\theta} = - \left( \frac{g}{l} - \frac{a \omega^2}{l} \cos(\omega t) \right) \sin \theta$$
 设系统的广义状态变量为 $u = [\theta, \dot{\theta}]^T$，以及系统参数 $p = \{l, m, g, a, \omega\}$，则运动方程可以显式地转换为如下的一阶偏微分方程组的向量形式：
-$$
-\frac{d}{dt}u(t) = f(u,t,p) = 
+$$\frac{d}{dt}u(t) = f(u,t,p) = 
 \begin{bmatrix}
 u_1 \\
 -\left( \frac{g}{l} - \frac{a \omega^2}{l} \cos(\omega t) \right) \sin u_0
-\end{bmatrix}
-$$
+\end{bmatrix}$$
 ### A.2 Runge-Kutta 等数值方法实现
 
 在 `src/ode_solver.py` 中，我们编写了一个经典的 4阶 Runge-Kutta 求解器（RK4），接口受 SciPy 的 `solve_ivp` 设计启发，使得任何满足 $f(t, y, *args)$ 的一阶ODE组在此接口中都可以直接调用。求解器的核心代码摘录如下：
@@ -71,18 +59,12 @@ def rk4_step(f, t, y, dt, *args):
 
 上述现象可以用**有效势能法 (Effective Potential)** 进行理论解释：
 Kapitza摆存在快变量（底座的高频震动产生）和慢变量（宏观摆动）。在 $\omega \gg \sqrt{g/l}$ 且振幅微小的条件下，将角度分离为慢速漂移分量 $\Theta$ 与高频微小颤动分量 $\xi$，经过平均法积分掉高频项后，系统有效势能 $V_{\text{eff}}(\theta)$ 近似由重力势能和高频动能的皮动势加成构成：
-$$
-V_{\text{eff}}(\theta) \approx mgl (1 - \cos\theta) + \frac{m a^2 \omega^2}{4} \sin^2\theta
-$$
+$$V_{\text{eff}}(\theta) \approx mgl (1 - \cos\theta) + \frac{m a^2 \omega^2}{4} \sin^2\theta$$
 我们需要分析 $\theta = \pi$ 处的稳定性（在最高点 $\cos\pi = -1, \sin\pi = 0$）：
 其对 $\theta$ 的二阶导数为：
-$$
-\frac{d^2 V_{\mathrm{eff}}}{d\theta^2} \Bigg|_{\theta=\pi} = mgl\cos\pi + \frac{m a^2 \omega^2}{2} (\cos^2\pi - \sin^2\pi) = -mgl + \frac{m a^2 \omega^2}{2}
-$$
+$$\frac{d^2 V_{\mathrm{eff}}}{d\theta^2} \Bigg|_{\theta=\pi} = mgl\cos\pi + \frac{m a^2 \omega^2}{2} (\cos^2\pi - \sin^2\pi) = -mgl + \frac{m a^2 \omega^2}{2}$$
 当二阶导数 $>0$ 时，这个倒置平衡点就会从“不稳定鞍点”变为“稳定极小值点”。即：
-$$
-\frac{a^2 \omega^2}{2} > gl \implies \omega > \sqrt{\frac{2gl}{a^2}} = \frac{\sqrt{2} \times 1}{0.1} \approx 14.14 \text{ rad/s}
-$$
+$$\frac{a^2 \omega^2}{2} > gl \implies \omega > \sqrt{\frac{2gl}{a^2}} = \frac{\sqrt{2} \times 1}{0.1} \approx 14.14 \text{ rad/s}$$
 *当 $\omega = 5, 10$ 时，$\omega < 14.14$，此条件未满足，有效势无法形成倒置点的势阱，重力主导摆锤下落；*
 *当 $\omega = 20$ 时，$\omega > 14.14$，倒置位置有效势能存在一个局域稳定势阱，动能带来的高频压制力超过了重力倾覆力矩，从而把小摆锤稳稳地支撑在了空中。这就解释了为什么 $\omega=20$ 下摆会悬停并振荡。*
 
@@ -93,20 +75,17 @@ $$
 ### B.1 系统完整方程与碰撞规则
 
 乒乓球受到重力与阻力，且将坐标和速度作为广义状态变量 $u = [y, v]^T$，运动方程在空中为：
-$$
-\begin{cases}
+$$\begin{cases}
 \dot{y} = v \\
 \dot{v} = -g - \gamma v
-\end{cases}
-$$
+\end{cases}$$
 当球触碰球拍时，位置满足 $y(t) = h(t) = A\sin(\omega t)$。
 球拍由于质量极大，速度不受碰撞影响，因此碰后状态改变遵循完美弹性碰撞（相对速度反向）：
-$$
-\begin{cases}
+$$\begin{cases}
 y_{after} = h(t_c) \\
 v_{after} = 2A\omega\cos(\omega t_c) - v_{before}
-\end{cases}
-$$
+\end{cases}$$
+
 ### B.2 碰撞的数值处理（Event Detection）
 
 对于此类具有不连续跳跃边界的ODE问题，如果简单的按照固定步长 $dt$ 更新，很大可能 $dt$ 跨过边界后，球已经进入拍子底下造成负反馈错误甚至越界。为了高精度处理这个问题，我们需要引入碰撞事件检测机制。
