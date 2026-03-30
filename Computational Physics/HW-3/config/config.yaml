@@ -25,3 +25,22 @@ kapitza:
     t_end: 50.0
     dt: 0.01  # RK4步长
 
+# Ping-Pong Simulation Configuration
+pingpong:
+  parameters:
+    g: 10.0      # 重力加速度
+    gamma: 0.02  # 空气阻尼
+    A: 0.02      # 球拍振幅
+    omega: 12.566370614359172 # 2 * 2 * pi = 4 * pi
+    
+  initial_conditions:
+    y_0: 0.3
+    v_0: 0.0
+    y_0_list: [0.3, 0.4, 0.45, 0.5, 0.6] # 不同的初始释放高度，用于探测稳态模式
+    
+  time:
+    t_start: 0.0
+    t_end: 1000.0
+    dt: 0.002
+    
+
