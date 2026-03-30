@@ -56,7 +56,11 @@ def rk4_step(f, t, y, dt, *args):
 ### A.3 物理现象发现
 
 针对 $l=m=g=1, a=0.1$ 和初始条件 $\theta(0) = \frac{4}{5}\pi, \dot{\theta}(0)=0$：
-我们使用编写好的求解器代入不同频率 $\omega$ 进行积分（见 `outputs/kapitza_omega_comparison.png`），可以观察到截然不同的动力学现象：
+我们使用编写好的求解器代入不同频率 $\omega$ 进行积分，模拟结果如下：
+
+![Kapitza 频率对比](asset/kapitza_omega_comparison.png)
+
+可以观察到截然不同的动力学现象：
 1. **$\omega = 5$**：运动极不稳定，摆锤不仅会迅速掉落，还会受强迫振动发生**绕轴翻旋**（$\theta$ 随时间向负方向不断增加超过 $2\pi$ 并持续震荡漂移）。
 2. **$\omega = 10$**：高频分量不足以维持小球于倒置态，摆锤向下坠落，并越过最低点在 $\theta \approx 0$（即自然悬垂位置）附近进行长期的**周期振荡**（围绕下稳定点）。
 3. **$\omega = 20$**：一个奇妙的现象发生了。尽管摆的初始位置 $\frac{4}{5}\pi$ 受重力会往下掉，但极高频的底座振荡导致摆锤没能掉下，而是反而向上靠拢，然后在 $\theta \approx \pi$（即**倒置/倒立状态**）附近稳定地振荡！
@@ -71,7 +75,7 @@ $$
 我们需要分析 $\theta = \pi$ 处的稳定性（在最高点 $\cos\pi = -1, \sin\pi = 0$）：
 其对 $\theta$ 的二阶导数为：
 $$
-\left. \frac{d^2 V_{\text{eff}}}{d\theta^2} \right|_{\theta=\pi} = mgl\cos\pi + \frac{m a^2 \omega^2}{2} (\cos^2\pi - \sin^2\pi) = -mgl + \frac{m a^2 \omega^2}{2}
+\frac{d^2 V_{\mathrm{eff}}}{d\theta^2} \Bigg|_{\theta=\pi} = mgl\cos\pi + \frac{m a^2 \omega^2}{2} (\cos^2\pi - \sin^2\pi) = -mgl + \frac{m a^2 \omega^2}{2}
 $$
 当二阶导数 $>0$ 时，这个倒置平衡点就会从“不稳定鞍点”变为“稳定极小值点”。即：
 $$
@@ -111,10 +115,18 @@ $$
 ### B.3 数值现象与稳态模式分析
 
 **i. 不同时间段轨迹展示**
-图 `outputs/pingpong_y0_0.3_timeline.png` 展示了 $y_0 = 0.3$ 下的情况：由于初始较高能量，小球初期产生混沌和高跳；但在末端 990-1000s 区间，小球已经彻底趋于一个极其规整的周期稳定解。
+以下展示了 $y_0 = 0.3$ 下的模拟情况：
+
+![乒乓球 y0=0.3 时序图](asset/pingpong_y0_0.3_timeline.png)
+
+由于初始较高能量，小球初期产生混沌和高跳；但在末端 990-1000s 区间，小球已经彻底趋于一个极其规整的周期稳定解。
 
 **ii. 稳定模式分析**
-图 `outputs/pingpong_modes_comparison.png` 对比了不同初值 $y_0$ 的末态表现。可以看出由于初值落在不同的吸引域 (basin of attraction)，它们进入了**不同的亚谐波锁定模式 (sub-harmonic resonance)**。有些是每次拍子上升都发生碰撞（1周期），有些则因为弹得很高，在空中飞过了几个拍子周期才落下（n周期）。
+以下对比了不同初值 $y_0$ 的末态表现 (相图和时序稳定态)：
+
+![乒乓球 稳定模式对比](asset/pingpong_modes_comparison.png)
+
+可以看出由于初值落在不同的吸引域 (basin of attraction)，它们进入了**不同的亚谐波锁定模式 (sub-harmonic resonance)**。有些是每次拍子上升都发生碰撞（1周期），有些则因为弹得很高，在空中飞过了几个拍子周期才落下（n周期）。
 
 **iii. 耗散的作用**
 阻尼引起系统相空间体积的指数收缩。如果没有阻尼，乒乓球很容易发生费米加速 (Fermi Acceleration)，即无限制地吸收能量；有了耗散，阻力消磨掉多余能量，系统最终被局限在收敛的低维吸引子（Attractor）上。
