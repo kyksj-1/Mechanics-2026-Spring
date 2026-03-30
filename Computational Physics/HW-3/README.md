@@ -1,12 +1,5 @@
 # Computational Physics - Homework 3
 
-## 报告信息
-- **执行人**：kyksj-1
-- **环境**：`conda` (`research_env`)
-- **运行时间**：2026年3月
-- **任务目标**：常微分方程数值求解（Runge-Kutta 法应用）与混沌/动力学系统分析   
-
----
 
 ## 问题A：Kapitza 摆 (Kapitza Pendulum)
 
@@ -47,7 +40,7 @@ $$
 \frac{d}{dt}u(t) = f(u,t,p) = 
 \begin{bmatrix}
 u_1 \\
-- \left( \frac{g}{l} - \frac{a \omega^2}{l} \cos(\omega t) \right) \sin u_0
+-\left( \frac{g}{l} - \frac{a \omega^2}{l} \cos(\omega t) \right) \sin u_0
 \end{bmatrix}
 $$
 
