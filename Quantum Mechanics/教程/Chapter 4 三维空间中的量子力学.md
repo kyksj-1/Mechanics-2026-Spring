@@ -1908,3 +1908,197 @@ plt.show()
 | 三重态与单态 | 对称/反对称 | CG 系数：$m = m_1 + m_2$ |
 
 ---
+
+## 4.5 电磁相互作用
+
+> **本节核心问题**：带电粒子在电磁场中的量子力学行为如何描述？矢势 $\mathbf{A}$ 在量子力学中是否具有"真实的"物理效应？
+
+```mermaid
+flowchart LR
+    A["经典拉格朗日量<br/>引入电磁势"] --> B["最小耦合<br/>p -> p - qA"]
+    B --> C["量子哈密顿量"]
+    C --> D["规范变换<br/>A -> A + grad Lambda"]
+    D --> E["波函数相位变化<br/>可观测量不变"]
+    E --> F["Aharonov-Bohm 效应<br/>A 的量子可观测性"]
+```
+
+---
+
+### 4.5.1 最小耦合
+
+#### 经典力学的铺垫
+
+正则动量与机械动量的关系：$m\dot{\mathbf{r}} = \mathbf{p}_{\text{can}} - q\mathbf{A}$。
+
+量子化：将正则动量替换为算符 $\hat{\mathbf{p}} = -i\hbar\nabla$：
+
+$$\boxed{\hat{H} = \frac{1}{2m}\left(\hat{\mathbf{p}} - q\mathbf{A}\right)^2 + q\Phi = \frac{1}{2m}\left(-i\hbar\nabla - q\mathbf{A}\right)^2 + q\Phi}$$
+
+这就是**最小耦合**处方：$\hat{\mathbf{p}} \to \hat{\mathbf{p}} - q\mathbf{A}$。
+
+#### 展开哈密顿量
+
+在**库仑规范** $\nabla \cdot \mathbf{A} = 0$ 下：
+
+$$\hat{H} = \frac{\hat{\mathbf{p}}^2}{2m} - \frac{q}{m}\mathbf{A} \cdot \hat{\mathbf{p}} + \frac{q^2 A^2}{2m} + q\Phi$$
+
+#### 均匀磁场中的特例
+
+对称规范 $\mathbf{A} = \frac{1}{2}\mathbf{B} \times \mathbf{r}$，$\mathbf{B} = B\hat{z}$：
+
+$$\hat{H} = \frac{\hat{\mathbf{p}}^2}{2m} - \frac{qB}{2m}\hat{L}_z + \frac{q^2 B^2}{8m}(x^2 + y^2) + q\Phi$$
+
+> 完整的带自旋粒子哈密顿量：$\hat{H} = \frac{1}{2m}(\hat{\mathbf{p}} - q\mathbf{A})^2 + q\Phi - \frac{q}{m}\hat{\mathbf{S}} \cdot \mathbf{B}$
+
+---
+
+### 4.5.2 规范变换
+
+#### 电磁势的非唯一性
+
+$$\boxed{\mathbf{A} \to \mathbf{A}' = \mathbf{A} + \nabla\Lambda, \qquad \Phi \to \Phi' = \Phi - \frac{\partial\Lambda}{\partial t}}$$
+
+物理场 $\mathbf{E}, \mathbf{B}$ 不变。
+
+#### 波函数的规范变换
+
+$$\boxed{\Psi \to \Psi' = e^{iq\Lambda/\hbar}\Psi}$$
+
+**证明**：最小耦合动量算符在规范变换下提取整体相位因子：
+
+$$(-i\hbar\nabla - q\mathbf{A}')\Psi' = e^{iq\Lambda/\hbar}(-i\hbar\nabla - q\mathbf{A})\Psi$$
+
+由此可以逐步验证变换后的 $\Psi'$ 满足对应 $(\mathbf{A}', \Phi')$ 的含时薛定谔方程。
+
+#### 物理可观测量的规范不变性
+
+- 概率密度：$|\Psi'|^2 = |\Psi|^2$ ✓
+- 机械动量期望值：$\langle \hat{\mathbf{p}} - q\mathbf{A}' \rangle_{\Psi'} = \langle \hat{\mathbf{p}} - q\mathbf{A} \rangle_{\Psi}$ ✓
+
+> **规范不变性原则**：所有物理可观测量必须在规范变换下不变。正则动量 $\hat{\mathbf{p}}$ 的期望值是规范依赖的，不是物理可观测量；机械动量 $\hat{\mathbf{p}} - q\mathbf{A}$ 才是。
+
+---
+
+### 4.5.3 Aharonov-Bohm 效应
+
+#### 思想实验
+
+双缝装置中，在双缝之间放置无限长螺线管。螺线管内部 $\mathbf{B} \neq 0$，外部 $\mathbf{B} = 0$ 但 $\mathbf{A} \neq 0$。电子只在外部传播。
+
+```mermaid
+flowchart LR
+    S["电子源"] --> SL["双缝屏"]
+    SL -->|"Path 1"| P["探测屏"]
+    SL -->|"Path 2"| P
+    SOL["螺线管<br/>B!=0 inside<br/>B=0 outside"] -.-> SL
+```
+
+#### 相位差
+
+沿路径传播的电子获得附加相位 $\exp(iq\int_\gamma \mathbf{A}\cdot d\mathbf{l}/\hbar)$。两路径的相位差：
+
+$$\boxed{\Delta\phi = \frac{q\Phi_B}{\hbar}}$$
+
+其中 $\Phi_B = \oint \mathbf{A}\cdot d\mathbf{l} = \int_S \mathbf{B}\cdot d\mathbf{S}$ 是螺线管中的总磁通量。
+
+#### 物理含义
+
+| 经典力学 | 量子力学 |
+|:---|:---|
+| $\mathbf{E}, \mathbf{B}$ 是基本物理量 | $\Phi, \mathbf{A}$ 更基本 |
+| $\Phi, \mathbf{A}$ 是数学工具 | $\mathbf{E}, \mathbf{B}$ 是导出量 |
+| 无力则无影响 | 无力仍有相位影响 |
+
+AB 效应已被实验精确验证（外村彰 1986 年电子全息术实验）。
+
+---
+
+> **Key Takeaway（4.5 节）**
+
+| 概念 | 关键公式/结论 |
+|:-----|:-------------|
+| 最小耦合 | $\hat{\mathbf{p}} \to \hat{\mathbf{p}} - q\mathbf{A}$ |
+| 带电粒子哈密顿量 | $\hat{H} = \frac{1}{2m}(\hat{\mathbf{p}} - q\mathbf{A})^2 + q\Phi$ |
+| 正则 vs 机械动量 | $m\mathbf{v} = \hat{\mathbf{p}} - q\mathbf{A}$（机械动量才是可观测量） |
+| 规范变换 | $\mathbf{A} \to \mathbf{A}+\nabla\Lambda$，$\Psi \to e^{iq\Lambda/\hbar}\Psi$ |
+| AB 相位 | $\Delta\phi = q\Phi_B/\hbar$ |
+| AB 效应意义 | $\mathbf{A}$ 在 $\mathbf{B}=0$ 区域仍影响量子相位 |
+
+---
+
+### 习题 4.29（概念理解）
+
+**(a)** 解释正则动量和机械动量的区别。为什么量子化的是正则动量 $\hat{\mathbf{p}} = -i\hbar\nabla$？
+
+**(b)** 规范变换下，$\langle \hat{\mathbf{p}} \rangle$ 是否改变？$\langle \hat{\mathbf{p}} - q\mathbf{A} \rangle$ 呢？
+
+**(c)** 经典力学能否描述 Aharonov-Bohm 效应？为什么？
+
+---
+
+### 习题 4.30（计算练习）
+
+**(a)** 验证对称规范 $\mathbf{A}_1 = \frac{B_0}{2}(-y, x, 0)$ 和朗道规范 $\mathbf{A}_2 = B_0(-y, 0, 0)$ 都给出 $\mathbf{B} = B_0\hat{z}$。
+
+**(b)** 找出 $\Lambda(\mathbf{r})$ 使得 $\mathbf{A}_2 = \mathbf{A}_1 + \nabla\Lambda$。
+
+**(c)** 写出两种规范下电子在均匀磁场中的哈密顿量。
+
+---
+
+### 习题 4.31（思考题）
+
+**(a)** 证明当 $\Phi_B = n \cdot \frac{2\pi\hbar}{|q|}$ 时 AB 效应消失。$\frac{2\pi\hbar}{|q|}$ 称为磁通量子。
+
+**(b)** 超导体中载流子为库珀对（$q = 2e$），磁通量子变为多少？
+
+**(c)** AB 效应是否允许超距信息传递？
+
+---
+
+### 习题 4.32（编程题）
+
+模拟 Aharonov-Bohm 效应对双缝干涉图样的影响。
+
+**(a)** 绘制 $\Delta\phi = 0, \pi/2, \pi, 3\pi/2$ 的干涉图样。
+
+**(b)** 制作磁通量-屏幕位置的伪彩色图。
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+# 参数
+d = 1.0; lam = 0.1; L = 100.0; k = 2*np.pi/lam
+y = np.linspace(-5, 5, 1000)
+delta = k * d * y / L
+
+def intensity(delta, dphi):
+    """双缝干涉强度（含AB相位差）"""
+    return np.cos((delta + dphi) / 2)**2
+
+# (a) 四种磁通量
+fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+for ax, dp, lab in zip(axes.flatten(),
+    [0, np.pi/2, np.pi, 3*np.pi/2],
+    [r'$\Delta\phi=0$', r'$\Delta\phi=\pi/2$',
+     r'$\Delta\phi=\pi$', r'$\Delta\phi=3\pi/2$']):
+    I = intensity(delta, dp)
+    ax.plot(y, I, 'b-', lw=0.8); ax.fill_between(y, I, alpha=0.3)
+    ax.set_title(lab); ax.set_ylim(0, 1.1)
+    ax.set_xlabel('y'); ax.set_ylabel('Intensity')
+plt.suptitle('AB Effect: Double-Slit Interference')
+plt.tight_layout(); plt.savefig('AB_interference.png', dpi=150); plt.show()
+
+# (b) 伪彩色图
+dphi_range = np.linspace(0, 4*np.pi, 500)
+Y, DP = np.meshgrid(delta, dphi_range)
+I2d = np.cos((Y + DP) / 2)**2
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.pcolormesh(y, dphi_range/np.pi, I2d, cmap='inferno', shading='auto')
+ax.set_xlabel('y'); ax.set_ylabel(r'$\Delta\phi/\pi$')
+ax.set_title('Interference vs Magnetic Flux')
+plt.tight_layout(); plt.savefig('AB_2d_map.png', dpi=150); plt.show()
+```
+
+---
