@@ -1168,3 +1168,409 @@ for n in range(1, 4):
 ```
 
 ---
+
+## 4.3 角动量
+
+> **本节核心问题**：能否完全不解微分方程，仅凭代数关系就确定角动量的本征值和本征态？
+
+在 4.1 节中，我们通过球坐标下的分离变量，"自然而然"地遇到了角动量量子数 $l$ 和 $m$。球谐函数 $Y_l^m(\theta, \phi)$ 的存在条件（$l = 0, 1, 2, \ldots$，$|m| \le l$）是从微分方程的正则性要求中推导出来的。
+
+但这种推导有一个根本性的局限：它**只适用于轨道角动量**——因为我们使用了 $\theta, \phi$ 这些空间坐标。后面我们将遇到**自旋角动量**（4.4 节），它没有经典的空间对应物，无法用 $\theta, \phi$ 来描述。
+
+因此，我们需要一种**更普适的方法**：完全抛开微分方程，纯粹从角动量算符的**代数对易关系**出发，推导出全部本征值谱和本征态结构。这种方法不仅适用于轨道角动量，也适用于自旋角动量——事实上，它适用于**任何满足角动量对易关系的算符**。
+
+```mermaid
+flowchart TB
+    A["角动量算符 Lx, Ly, Lz"] --> B["对易关系<br/>[Lx,Ly] = ihbar Lz<br/>及其轮换"]
+    B --> C["L^2 与 Lx,Ly,Lz 均对易"]
+    C --> D["L^2 和 Lz 可同时对角化<br/>共同本征态 |l,m>"]
+    D --> E["定义升降算符<br/>L+ = Lx + iLy<br/>L- = Lx - iLy"]
+    E --> F["升降算符改变 m 值<br/>L+|l,m> ~ |l,m+1><br/>L-|l,m> ~ |l,m-1>"]
+    F --> G["m 有上下界<br/>推导出 l 和 m 的量子化"]
+    G --> H["本征值谱<br/>l=0,1/2,1,3/2,...<br/>m=-l,...,+l"]
+    H --> I["轨道角动量: l=整数<br/>自旋角动量: l=半整数也可"]
+```
+
+---
+
+### 4.3.1 角动量算符与对易关系
+
+#### 角动量算符的定义
+
+经典力学中，角动量定义为 $\mathbf{L} = \mathbf{r} \times \mathbf{p}$。在量子力学中，我们将位置和动量替换为相应的算符 $\hat{\mathbf{r}}$ 和 $\hat{\mathbf{p}}$，得到**角动量算符**：
+
+$$\boxed{\hat{\mathbf{L}} = \hat{\mathbf{r}} \times \hat{\mathbf{p}}}$$
+
+写成分量形式：
+
+$$\hat{L}_x = \hat{y}\hat{p}_z - \hat{z}\hat{p}_y$$
+$$\hat{L}_y = \hat{z}\hat{p}_x - \hat{x}\hat{p}_z$$
+$$\hat{L}_z = \hat{x}\hat{p}_y - \hat{y}\hat{p}_x$$
+
+这三个表达式可以用 Levi-Civita 符号紧凑地统一为：
+
+$$\hat{L}_i = \sum_{j,k}\epsilon_{ijk}\hat{r}_j \hat{p}_k$$
+
+其中 $\epsilon_{ijk}$ 是全反对称张量（$\epsilon_{xyz} = +1$，交换任意两个指标变号，有重复指标则为零）。
+
+我们还定义**角动量的平方**算符：
+
+$$\hat{L}^2 = \hat{L}_x^2 + \hat{L}_y^2 + \hat{L}_z^2$$
+
+#### 基本对易关系的推导
+
+角动量算符之间的对易关系是整个角动量理论的基石。我们来严格推导 $[\hat{L}_x, \hat{L}_y]$。
+
+**步骤 1**：写出待计算的对易子
+
+$$[\hat{L}_x, \hat{L}_y] = [\hat{y}\hat{p}_z - \hat{z}\hat{p}_y, \;\hat{z}\hat{p}_x - \hat{x}\hat{p}_z]$$
+
+**步骤 2**：利用对易子的双线性性质展开为四项
+
+$$= [\hat{y}\hat{p}_z, \hat{z}\hat{p}_x] - [\hat{y}\hat{p}_z, \hat{x}\hat{p}_z] - [\hat{z}\hat{p}_y, \hat{z}\hat{p}_x] + [\hat{z}\hat{p}_y, \hat{x}\hat{p}_z]$$
+
+**步骤 3**：逐项计算。我们需要用到基本对易关系 $[\hat{r}_i, \hat{p}_j] = i\hbar\delta_{ij}$ 以及恒等式 $[\hat{A}\hat{B}, \hat{C}] = \hat{A}[\hat{B}, \hat{C}] + [\hat{A}, \hat{C}]\hat{B}$。
+
+**第一项**：$[\hat{y}\hat{p}_z, \hat{z}\hat{p}_x]$
+
+$$= \hat{y}[\hat{p}_z, \hat{z}\hat{p}_x] + [\hat{y}, \hat{z}\hat{p}_x]\hat{p}_z$$
+
+其中 $[\hat{p}_z, \hat{z}\hat{p}_x] = [\hat{p}_z, \hat{z}]\hat{p}_x + \hat{z}[\hat{p}_z, \hat{p}_x] = (-i\hbar)\hat{p}_x + 0 = -i\hbar\hat{p}_x$
+
+而 $[\hat{y}, \hat{z}\hat{p}_x] = \hat{z}[\hat{y}, \hat{p}_x] + [\hat{y}, \hat{z}]\hat{p}_x = 0 + 0 = 0$
+
+所以第一项 $= \hat{y}(-i\hbar\hat{p}_x) = -i\hbar\hat{y}\hat{p}_x$。
+
+**第二项**：$[\hat{y}\hat{p}_z, \hat{x}\hat{p}_z] = 0$（所有涉及的对易子为零）。
+
+**第三项**：$[\hat{z}\hat{p}_y, \hat{z}\hat{p}_x] = 0$（所有涉及的对易子为零）。
+
+**第四项**：$[\hat{z}\hat{p}_y, \hat{x}\hat{p}_z]$
+
+$[\hat{z}, \hat{x}\hat{p}_z] = \hat{x}[\hat{z}, \hat{p}_z] + [\hat{z}, \hat{x}]\hat{p}_z = \hat{x}(i\hbar) + 0 = i\hbar\hat{x}$
+
+所以第四项 $= i\hbar\hat{x}\hat{p}_y$。
+
+**步骤 4**：合并结果
+
+$$[\hat{L}_x, \hat{L}_y] = -i\hbar\hat{y}\hat{p}_x - 0 - 0 + i\hbar\hat{x}\hat{p}_y = i\hbar(\hat{x}\hat{p}_y - \hat{y}\hat{p}_x) = i\hbar\hat{L}_z$$
+
+因此：
+
+$$\boxed{[\hat{L}_x, \hat{L}_y] = i\hbar\hat{L}_z}$$
+
+由于 $x, y, z$ 三个方向在叉乘定义中具有**轮换对称性**（$x \to y \to z \to x$），其余两个对易关系可以直接通过轮换得到：
+
+$$\boxed{[\hat{L}_y, \hat{L}_z] = i\hbar\hat{L}_x, \qquad [\hat{L}_z, \hat{L}_x] = i\hbar\hat{L}_y}$$
+
+这三个对易关系可以用 Levi-Civita 符号统一为一条：
+
+$$\boxed{[\hat{L}_i, \hat{L}_j] = i\hbar\sum_k \epsilon_{ijk}\hat{L}_k}$$
+
+> **重要物理含义**：$\hat{L}_x$、$\hat{L}_y$、$\hat{L}_z$ 三个分量**互不对易**，这意味着它们不能同时具有确定值。由广义不确定性原理：
+> $$\sigma_{L_x}\sigma_{L_y} \ge \frac{\hbar}{2}|\langle\hat{L}_z\rangle|$$
+
+#### $\hat{L}^2$ 与各分量的对易关系
+
+虽然三个分量互不对易，但**角动量的平方** $\hat{L}^2$ 与每个分量**都对易**。
+
+**推导** $[\hat{L}^2, \hat{L}_z] = 0$：
+
+$$[\hat{L}^2, \hat{L}_z] = [\hat{L}_x^2, \hat{L}_z] + [\hat{L}_y^2, \hat{L}_z] + \underbrace{[\hat{L}_z^2, \hat{L}_z]}_{= 0}$$
+
+利用 $[\hat{A}^2, \hat{B}] = \hat{A}[\hat{A}, \hat{B}] + [\hat{A}, \hat{B}]\hat{A}$：
+
+$$[\hat{L}_x^2, \hat{L}_z] = -i\hbar(\hat{L}_x\hat{L}_y + \hat{L}_y\hat{L}_x)$$
+
+$$[\hat{L}_y^2, \hat{L}_z] = i\hbar(\hat{L}_y\hat{L}_x + \hat{L}_x\hat{L}_y)$$
+
+两项相加为零。由轮换对称性：
+
+$$\boxed{[\hat{L}^2, \hat{L}_x] = 0, \qquad [\hat{L}^2, \hat{L}_y] = 0, \qquad [\hat{L}^2, \hat{L}_z] = 0}$$
+
+> **物理意义**：我们可以**同时测量**角动量的大小 $L^2$ 和它的**一个分量**（习惯上选 $L_z$）。但不能同时知道两个或三个分量。
+
+```mermaid
+flowchart LR
+    A["L^2"] --- B["与所有 Li 对易<br/>可同时测量"]
+    C["Lx"] ---|"不对易"| D["Ly"]
+    D ---|"不对易"| E["Lz"]
+    E ---|"不对易"| C
+    A --- F["选择 L^2 和 Lz<br/>作为完全对易集"]
+```
+
+---
+
+### 4.3.2 升降算符与对易关系
+
+#### 升降算符的定义
+
+$$\boxed{\hat{L}_+ \equiv \hat{L}_x + i\hat{L}_y, \qquad \hat{L}_- \equiv \hat{L}_x - i\hat{L}_y}$$
+
+$\hat{L}_+$ 和 $\hat{L}_-$ **不是厄米算符**——它们互为厄米共轭：$\hat{L}_+^\dagger = \hat{L}_-$。
+
+#### 升降算符的对易关系
+
+$$\boxed{[\hat{L}_z, \hat{L}_+] = +\hbar\hat{L}_+, \qquad [\hat{L}_z, \hat{L}_-] = -\hbar\hat{L}_-}$$
+
+$$\boxed{[\hat{L}_+, \hat{L}_-] = 2\hbar\hat{L}_z}$$
+
+#### 用升降算符表达 $\hat{L}^2$
+
+$$\boxed{\hat{L}^2 = \hat{L}_-\hat{L}_+ + \hat{L}_z^2 + \hbar\hat{L}_z}$$
+
+$$\boxed{\hat{L}^2 = \hat{L}_+\hat{L}_- + \hat{L}_z^2 - \hbar\hat{L}_z}$$
+
+由 $[\hat{L}^2, \hat{L}_i] = 0$，有 $[\hat{L}^2, \hat{L}_{\pm}] = 0$——升降算符不改变 $L^2$ 的本征值。
+
+---
+
+### 4.3.3 升降算符的作用
+
+#### 共同本征态
+
+设 $\hat{L}^2$ 和 $\hat{L}_z$ 的共同本征态为 $|l, m\rangle$：
+
+$$\hat{L}^2|l, m\rangle = \lambda|l, m\rangle, \qquad \hat{L}_z|l, m\rangle = m\hbar|l, m\rangle$$
+
+#### 升降算符改变 $m$
+
+**定理**：$\hat{L}_+|l, m\rangle$（若非零）是 $\hat{L}_z$ 本征值为 $(m+1)\hbar$ 的本征态，$\hat{L}^2$ 本征值不变。
+
+**证明**：利用 $[\hat{L}_z, \hat{L}_+] = \hbar\hat{L}_+$：
+
+$$\hat{L}_z(\hat{L}_+|l, m\rangle) = (\hat{L}_+\hat{L}_z + \hbar\hat{L}_+)|l, m\rangle = (m+1)\hbar(\hat{L}_+|l, m\rangle)$$
+
+#### 比例系数的推导
+
+由 $\|\hat{L}_+|l, m\rangle\|^2 = \langle l, m|\hat{L}_-\hat{L}_+|l, m\rangle = \lambda - m(m+1)\hbar^2$，取 $\lambda = l(l+1)\hbar^2$ 后：
+
+$$\boxed{\hat{L}_+|l, m\rangle = \hbar\sqrt{l(l+1) - m(m+1)}\;|l, m+1\rangle}$$
+
+$$\boxed{\hat{L}_-|l, m\rangle = \hbar\sqrt{l(l+1) - m(m-1)}\;|l, m-1\rangle}$$
+
+> **助记**：$l(l+1) - m(m \pm 1) = (l \mp m)(l \pm m + 1)$
+
+---
+
+### 4.3.4 本征值谱的推导
+
+#### $m$ 有上下界
+
+$$\langle \hat{L}^2 \rangle = \langle \hat{L}_x^2 \rangle + \langle \hat{L}_y^2 \rangle + \langle \hat{L}_z^2 \rangle \ge \langle \hat{L}_z^2 \rangle \implies \lambda \ge m^2\hbar^2$$
+
+#### "升到头"与"降到头"
+
+**升到头**：$\hat{L}_+|l, l_{\text{top}}\rangle = 0 \implies \lambda = l_{\text{top}}(l_{\text{top}} + 1)\hbar^2$
+
+**降到头**：$\hat{L}_-|l, l_{\text{bot}}\rangle = 0 \implies \lambda = l_{\text{bot}}(l_{\text{bot}} - 1)\hbar^2$
+
+联立得 $(l_{\text{top}} + l_{\text{bot}})(l_{\text{top}} - l_{\text{bot}} + 1) = 0$，唯一解为 $l_{\text{bot}} = -l_{\text{top}}$。
+
+从 $-l_{\text{top}}$ 到 $l_{\text{top}}$ 升 $2l_{\text{top}}$ 步，必须为非负整数，故：
+
+$$\boxed{l = 0, \frac{1}{2}, 1, \frac{3}{2}, 2, \frac{5}{2}, \ldots}$$
+
+$$\boxed{m = -l, -l+1, \ldots, l-1, l \quad (\text{共 } 2l+1 \text{ 个值})}$$
+
+$$\boxed{\hat{L}^2|l, m\rangle = l(l+1)\hbar^2|l, m\rangle, \qquad \hat{L}_z|l, m\rangle = m\hbar|l, m\rangle}$$
+
+> **半整数的深意**：代数方法允许 $l$ 取**半整数**值，这预言了**自旋角动量**的存在。
+
+| | 轨道角动量 | 自旋角动量 |
+|---|---|---|
+| **量子数取值** | $l = 0, 1, 2, \ldots$（整数） | $s = 0, \frac{1}{2}, 1, \frac{3}{2}, \ldots$（整数或半整数） |
+| **描述方式** | 可用 $Y_l^m(\theta, \phi)$ 表示 | 不能用空间函数表示 |
+| **推导方法** | 微分方程或代数法 | 只能用代数法 |
+| **物理来源** | 粒子的空间运动 | 粒子的内禀性质 |
+
+---
+
+### 4.3.5 角动量本征态与球谐函数的联系
+
+#### 位置表象中的角动量算符
+
+$$\hat{L}_z = -i\hbar\frac{\partial}{\partial\phi}$$
+
+$$\hat{L}_{\pm} = \pm\hbar e^{\pm i\phi}\left(\frac{\partial}{\partial\theta} \pm i\cot\theta\frac{\partial}{\partial\phi}\right)$$
+
+$$\hat{L}^2 = -\hbar^2\left[\frac{1}{\sin\theta}\frac{\partial}{\partial\theta}\left(\sin\theta\frac{\partial}{\partial\theta}\right) + \frac{1}{\sin^2\theta}\frac{\partial^2}{\partial\phi^2}\right]$$
+
+#### $Y_l^m$ 就是共同本征函数
+
+4.1.6 节的角向方程正是 $\hat{L}^2 Y = l(l+1)\hbar^2 Y$ 的坐标表示，$\phi$ 方程对应 $\hat{L}_z\Phi = m\hbar\Phi$。因此：
+
+$$\boxed{Y_l^m(\theta, \phi) = \langle\theta, \phi|l, m\rangle}$$
+
+#### 用升降算符构造球谐函数
+
+从 $\hat{L}_-Y_l^{-l} = 0$ 出发求解基态，再反复作用 $\hat{L}_+$ 递推构造全部 $Y_l^m$。
+
+```mermaid
+flowchart TB
+    A["对易关系<br/>[Li,Lj] = ihbar epsilon_ijk Lk"] --> B["L^2 与所有 Li 对易"]
+    B --> C["共同本征态 |l,m>"]
+    A --> D["升降算符 L+, L-"]
+    D --> E["[Lz,L+]=+hbar L+<br/>[Lz,L-]=-hbar L-"]
+    E --> F["L+ 升 m, L- 降 m"]
+    F --> G["m 有上下界"]
+    G --> H["l = 0, 1/2, 1, 3/2, ..."]
+    H --> I["整数 l: 轨道角动量"]
+    H --> J["半整数 l: 自旋角动量"]
+```
+
+---
+
+> **Key Takeaway（4.3 节）**
+
+| 主题 | 核心结论 | 关键公式 |
+|------|---------|---------|
+| 对易关系 | $L_x, L_y, L_z$ 两两不对易 | $[\hat{L}_i, \hat{L}_j] = i\hbar\epsilon_{ijk}\hat{L}_k$ |
+| $L^2$ 的特殊性 | $L^2$ 与所有分量对易 | $[\hat{L}^2, \hat{L}_i] = 0$ |
+| 升降算符 | $\hat{L}_{\pm}$ 升/降 $m$ 一个单位 | $[\hat{L}_z, \hat{L}_{\pm}] = \pm\hbar\hat{L}_{\pm}$ |
+| 升降系数 | 取决于 $l, m$ | $\hat{L}_{\pm}\|l,m\rangle = \hbar\sqrt{l(l+1)-m(m\pm 1)}\|l,m\pm 1\rangle$ |
+| 本征值谱 | $l$ 可取整数或半整数 | $l = 0, \frac{1}{2}, 1, \ldots$；$m = -l, \ldots, l$ |
+| 与球谐函数 | $Y_l^m$ 是 $L^2, L_z$ 的共同本征函数 | $Y_l^m(\theta,\phi) = \langle\theta,\phi\|l,m\rangle$ |
+
+---
+
+### 习题 4.15（概念理解）
+
+**(a)** 解释为什么我们选择 $\hat{L}^2$ 和 $\hat{L}_z$ 作为同时对角化的算符对，而不是 $\hat{L}^2$ 和 $\hat{L}_x$。选择 $\hat{L}_x$ 是否同样合法？
+
+**(b)** 对于 $l = 3$ 的角动量态，列出所有可能的 $m$ 值，并计算 $|\mathbf{L}|$（即 $\sqrt{\langle\hat{L}^2\rangle}$）和 $|L_z|_{\max}$ 的比值。
+
+**(c)** 当 $l \to \infty$ 时，$|L_z|_{\max}/|\mathbf{L}|$ 趋于什么？这与经典极限有何关系？
+
+---
+
+### 习题 4.16（计算练习）
+
+**(a)** 利用 $[\hat{L}_x, \hat{L}_y] = i\hbar\hat{L}_z$ 及其轮换关系，直接推导 $[\hat{L}^2, \hat{L}_x] = 0$。
+
+**(b)** 验证 $\hat{L}_+\hat{L}_- + \hat{L}_-\hat{L}_+ = 2(\hat{L}^2 - \hat{L}_z^2)$。
+
+**(c)** 对于态 $|2, 1\rangle$，计算 $\langle\hat{L}_x^2\rangle$ 和 $\langle\hat{L}_y^2\rangle$。
+
+---
+
+### 习题 4.17（计算练习）
+
+**(a)** 计算 $\hat{L}_+|3, 2\rangle$、$\hat{L}_-|3, 2\rangle$、$\hat{L}_+|3, 3\rangle$、$\hat{L}_-|3, -3\rangle$ 的结果。
+
+**(b)** 从 $\hat{L}_-Y_1^{-1} = 0$ 出发，利用 $\hat{L}_-$ 在球坐标中的微分形式，验证 $Y_1^{-1} \propto \sin\theta \, e^{-i\phi}$。
+
+**(c)** 对 $Y_1^{-1}$ 作用 $\hat{L}_+$，计算 $Y_1^0$，验证你的结果与 4.1.6 节球谐函数表一致。
+
+---
+
+### 习题 4.18（往年考题改编：向量叉乘形式的对易关系）
+
+**证明**：角动量算符满足向量叉乘形式的对易关系：
+
+$$\boxed{\hat{\mathbf{L}} \times \hat{\mathbf{L}} = i\hbar\hat{\mathbf{L}}}$$
+
+**(a)** 写出向量叉乘 $\hat{\mathbf{L}} \times \hat{\mathbf{L}}$ 的各分量。
+
+**(b)** 计算 $(\hat{\mathbf{L}} \times \hat{\mathbf{L}})_x = \hat{L}_y\hat{L}_z - \hat{L}_z\hat{L}_y = [\hat{L}_y, \hat{L}_z]$，验证它等于 $i\hbar\hat{L}_x$。
+
+**(c)** 对 $y$ 和 $z$ 分量做同样的验证，从而完成证明。
+
+**(d)** 解释为什么 $\hat{\mathbf{L}} \times \hat{\mathbf{L}} \neq 0$ 是一个纯粹的量子效应。
+
+---
+
+### 习题 4.19（思考题）
+
+**(a)** 在代数推导中，我们得到 $l$ 可以取半整数。但对于**轨道角动量**，$l$ 必须是整数。请从球谐函数的单值性条件出发，解释为什么轨道角动量排除了半整数。
+
+**(b)** 自旋为 $1/2$ 的粒子，其 $\hat{S}^2$ 和 $\hat{S}_z$ 的本征值分别是什么？有多少个本征态？
+
+**(c)** 假设存在某种"广义角动量"算符 $\hat{J}_x, \hat{J}_y, \hat{J}_z$，满足与轨道角动量完全相同的对易关系。本节的**全部代数推导**是否仍然成立？
+
+---
+
+### 习题 4.20（编程题）
+
+用 Python 数值验证角动量升降算符的作用。
+
+**(a)** 对于 $l = 2$，在 $|l, m\rangle$ 基底下，构造 $\hat{L}_z$、$\hat{L}_+$、$\hat{L}_-$ 和 $\hat{L}^2$ 的 $5 \times 5$ 矩阵表示。
+
+**(b)** 数值验证 $[\hat{L}_z, \hat{L}_+] = \hbar\hat{L}_+$、$[\hat{L}_+, \hat{L}_-] = 2\hbar\hat{L}_z$、$[\hat{L}^2, \hat{L}_z] = 0$。
+
+**(c)** 对 $\hat{L}^2$ 进行数值对角化，验证其本征值均为 $l(l+1)\hbar^2 = 6\hbar^2$。
+
+**(d)** 将程序推广到 $l = 3$，验证相同的对易关系。
+
+```python
+import numpy as np
+
+def build_angular_momentum_matrices(l):
+    """
+    构造角动量算符在 |l,m> 基底下的矩阵表示。
+    基底排列顺序: m = l, l-1, ..., -l+1, -l （从大到小）
+
+    参数:
+        l: 角动量量子数（非负整数或半整数）
+    返回:
+        Lz, Lp, Lm, L2: 分别为 Lz, L+, L-, L^2 的矩阵（单位: hbar）
+    """
+    dim = int(2 * l + 1)
+    m_values = np.arange(l, -l - 1, -1)
+
+    # Lz 是对角矩阵
+    Lz = np.diag(m_values)
+
+    # L+ 升算符
+    Lp = np.zeros((dim, dim))
+    for i in range(1, dim):
+        m = m_values[i]
+        coeff = np.sqrt(l * (l + 1) - m * (m + 1))
+        Lp[i - 1, i] = coeff
+
+    # L- 降算符
+    Lm = np.zeros((dim, dim))
+    for i in range(dim - 1):
+        m = m_values[i]
+        coeff = np.sqrt(l * (l + 1) - m * (m - 1))
+        Lm[i + 1, i] = coeff
+
+    # L^2 = l(l+1) * I
+    L2 = l * (l + 1) * np.eye(dim)
+
+    return Lz, Lp, Lm, L2
+
+def verify_commutation_relations(l):
+    """数值验证角动量对易关系（hbar = 1）。"""
+    Lz, Lp, Lm, L2 = build_angular_momentum_matrices(l)
+
+    print(f"=== l = {l}, 矩阵维度 = {int(2*l+1)} ===\n")
+
+    # [Lz, L+] = L+
+    comm1 = Lz @ Lp - Lp @ Lz
+    print(f"[Lz, L+] = hbar*L+: 误差 = {np.max(np.abs(comm1 - Lp)):.2e}")
+
+    # [L+, L-] = 2*Lz
+    comm2 = Lp @ Lm - Lm @ Lp
+    print(f"[L+, L-] = 2*hbar*Lz: 误差 = {np.max(np.abs(comm2 - 2*Lz)):.2e}")
+
+    # [L^2, Lz] = 0
+    comm3 = L2 @ Lz - Lz @ L2
+    print(f"[L^2, Lz] = 0: 误差 = {np.max(np.abs(comm3)):.2e}")
+
+    # L^2 本征值
+    eigenvalues = np.linalg.eigvalsh(L2)
+    print(f"L^2 本征值: {eigenvalues} (期望 {l*(l+1):.1f})")
+
+    # Lx^2 + Ly^2 + Lz^2 = L^2
+    Lx = (Lp + Lm) / 2.0
+    Ly = (Lp - Lm) / (2.0j)
+    L2_check = Lx @ Lx + Ly @ Ly + Lz @ Lz
+    print(f"Lx^2+Ly^2+Lz^2 = L^2: 误差 = {np.max(np.abs(L2_check - L2)):.2e}\n")
+
+# --- 验证 ---
+verify_commutation_relations(l=2)
+verify_commutation_relations(l=3)
+```
+
+---
