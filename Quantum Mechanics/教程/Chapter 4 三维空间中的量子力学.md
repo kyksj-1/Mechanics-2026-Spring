@@ -1574,3 +1574,337 @@ verify_commutation_relations(l=3)
 ```
 
 ---
+
+## 4.4 自旋
+
+> **本节核心问题**：为什么需要自旋？自旋与轨道角动量有何异同？如何用有限维矩阵描述自旋？
+
+在 4.3 节中，我们从角动量的代数对易关系出发，证明了角动量量子数 $l$ 可以取**整数或半整数**：$l = 0, \frac{1}{2}, 1, \frac{3}{2}, 2, \ldots$ 但当我们回到轨道角动量时，球谐函数的单值性条件要求 $l$ 必须是**整数**。
+
+那半整数的情况到底有没有物理实现？答案是肯定的——**自旋**（spin）就是半整数角动量的化身。自旋是微观粒子的一种**内禀角动量**，它不来源于粒子在空间中的运动，没有经典对应物，也无法用坐标 $\theta, \phi$ 的微分算符来表示。然而，它满足与轨道角动量完全相同的代数对易关系，因此 4.3 节的全部代数推导——本征值谱、升降算符、系数公式——统统适用。
+
+```mermaid
+flowchart TB
+    A["4.3 节代数推导<br/>对易关系 => 本征值谱"] --> B["轨道角动量<br/>l = 0, 1, 2, ...<br/>球谐函数"]
+    A --> C["自旋角动量<br/>s = 0, 1/2, 1, 3/2, ...<br/>旋量表示"]
+    C --> D["自旋 1/2<br/>电子、质子、中子<br/>泡利矩阵"]
+    D --> E["任意方向测量"]
+    D --> F["磁场中的行为<br/>Larmor 进动<br/>Stern-Gerlach 实验"]
+    D --> G["角动量合成<br/>三重态与单态<br/>CG 系数"]
+```
+
+---
+
+### 4.4.1 自旋的引入
+
+#### 从实验到理论：自旋的发现
+
+1922 年，斯特恩（Otto Stern）和格拉赫（Walther Gerlach）将银原子束通过一个不均匀磁场，期望由轨道角动量引起的分裂。然而实验结果令人困惑：银原子束被分裂成**恰好两束**。
+
+对于轨道角动量 $l$，磁量子数 $m$ 可以取 $2l+1$ 个值（$m = -l, -l+1, \ldots, l$），束的数目应该是**奇数**。两束分裂对应的是 $2l+1 = 2$，即 $l = \frac{1}{2}$——一个半整数！但我们已经知道，轨道角动量的 $l$ 只能取整数。
+
+1925 年，乌伦贝克（Uhlenbeck）和古德斯密特（Goudsmit）提出了解决方案：电子携带一种**内禀角动量**，称为**自旋**（spin），其量子数 $s = \frac{1}{2}$。银原子的基态电子处于 $l = 0$ 态（轨道角动量为零），Stern-Gerlach 实验中的分裂完全来自于自旋。
+
+#### 自旋算符与对易关系
+
+$$\boxed{[\hat{S}_i, \hat{S}_j] = i\hbar\,\epsilon_{ijk}\,\hat{S}_k}$$
+
+$$[\hat{S}^2, \hat{S}_i] = 0, \quad (i = x, y, z)$$
+
+$$\hat{S}^2|s, m_s\rangle = s(s+1)\hbar^2\,|s, m_s\rangle, \qquad \hat{S}_z|s, m_s\rangle = m_s\hbar\,|s, m_s\rangle$$
+
+自旋升降算符：$\hat{S}_\pm = \hat{S}_x \pm i\hat{S}_y$，作用为：
+
+$$\hat{S}_\pm|s, m_s\rangle = \hbar\sqrt{s(s+1) - m_s(m_s \pm 1)}\,|s, m_s \pm 1\rangle$$
+
+#### 自旋与轨道角动量的关键区别
+
+| 特征 | 轨道角动量 $\hat{\mathbf{L}}$ | 自旋角动量 $\hat{\mathbf{S}}$ |
+|------|--------------------------|--------------------------|
+| 对易关系 | $[\hat{L}_i, \hat{L}_j] = i\hbar\epsilon_{ijk}\hat{L}_k$ | $[\hat{S}_i, \hat{S}_j] = i\hbar\epsilon_{ijk}\hat{S}_k$ |
+| 微分算符表示 | 有：$\hat{L}_z = -i\hbar\frac{\partial}{\partial\phi}$ | **没有** |
+| 量子数取值 | $l = 0, 1, 2, \ldots$（仅整数） | $s = 0, \frac{1}{2}, 1, \frac{3}{2}, \ldots$ |
+| 经典对应 | 粒子绕某点的角动量 | 无经典对应物 |
+| 粒子依赖性 | 可取任意值 | 每种粒子有**固定的** $s$ |
+| 态空间维度 | 无穷维 | 有限维（$(2s+1)$ 维） |
+
+---
+
+### 4.4.2 自旋 1/2
+
+对于 $s = 1/2$，$m_s = \pm\frac{1}{2}$，态空间是**二维的**。
+
+$$\boxed{|\!\uparrow\rangle = \begin{pmatrix} 1 \\ 0 \end{pmatrix}, \qquad |\!\downarrow\rangle = \begin{pmatrix} 0 \\ 1 \end{pmatrix}}$$
+
+$$\boxed{\chi = \begin{pmatrix} a \\ b \end{pmatrix}, \quad |a|^2 + |b|^2 = 1}$$
+
+#### $\hat{S}_z$、$\hat{S}^2$ 和泡利矩阵
+
+$$\boxed{\hat{S}_z = \frac{\hbar}{2}\begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}, \qquad \hat{S}^2 = \frac{3}{4}\hbar^2\,\mathbf{I}}$$
+
+$$\hat{S}_x = \frac{\hbar}{2}\begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}, \qquad \hat{S}_y = \frac{\hbar}{2}\begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix}$$
+
+**泡利矩阵**（$\hat{S}_i = \frac{\hbar}{2}\sigma_i$）：
+
+$$\boxed{\sigma_x = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}, \quad \sigma_y = \begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix}, \quad \sigma_z = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}}$$
+
+**泡利矩阵的核心性质**：
+
+1. 厄米：$\sigma_i^\dagger = \sigma_i$
+2. 平方为单位矩阵：$\sigma_i^2 = \mathbf{I}$
+3. 反对易：$\sigma_i\sigma_j + \sigma_j\sigma_i = 2\delta_{ij}\mathbf{I}$
+4. 乘积公式：$\sigma_i\sigma_j = \delta_{ij}\mathbf{I} + i\epsilon_{ijk}\sigma_k$
+
+---
+
+### 习题 4.21
+
+**(概念理解)**
+
+**(a)** 为什么自旋 $s = 1/2$ 的粒子可以存在，而轨道角动量 $l = 1/2$ 不行？
+
+**(b)** 对于自旋 $s = 1$ 的粒子，态空间是几维的？写出 $\hat{S}_z$ 在 $\{|1,1\rangle, |1,0\rangle, |1,-1\rangle\}$ 基底下的矩阵表示。
+
+**(c)** 证明：对于自旋 $1/2$，$\hat{S}^2 = \frac{3}{4}\hbar^2\mathbf{I}$。
+
+---
+
+### 习题 4.22
+
+**(计算练习)**
+
+**(a)** 验证泡利矩阵的反对易关系 $\{\sigma_i, \sigma_j\} = 2\delta_{ij}\mathbf{I}$。
+
+**(b)** 证明乘积公式 $\sigma_i\sigma_j = \delta_{ij}\mathbf{I} + i\epsilon_{ijk}\sigma_k$。
+
+**(c)** 利用乘积公式证明：$(\boldsymbol{\sigma}\cdot\mathbf{A})(\boldsymbol{\sigma}\cdot\mathbf{B}) = \mathbf{A}\cdot\mathbf{B}\;\mathbf{I} + i\boldsymbol{\sigma}\cdot(\mathbf{A}\times\mathbf{B})$。
+
+---
+
+### 4.4.3 沿任意方向的自旋测量
+
+沿方向 $\hat{n} = (\sin\theta\cos\phi, \sin\theta\sin\phi, \cos\theta)$ 的自旋算符：
+
+$$\boxed{\hat{S}_n = \frac{\hbar}{2}(\boldsymbol{\sigma}\cdot\hat{n}) = \frac{\hbar}{2}\begin{pmatrix} \cos\theta & \sin\theta\,e^{-i\phi} \\ \sin\theta\,e^{i\phi} & -\cos\theta \end{pmatrix}}$$
+
+本征值恒为 $\pm\hbar/2$。本征态：
+
+$$\boxed{\chi_+^{(n)} = \begin{pmatrix} \cos\frac{\theta}{2} \\ e^{i\phi}\sin\frac{\theta}{2} \end{pmatrix}, \qquad \chi_-^{(n)} = \begin{pmatrix} -e^{-i\phi}\sin\frac{\theta}{2} \\ \cos\frac{\theta}{2} \end{pmatrix}}$$
+
+---
+
+### 习题 4.23
+
+**(计算练习)**
+
+**(a)** 电子处于 $\hat{S}_x$ 本征态 $\chi_+^{(x)} = \frac{1}{\sqrt{2}}\begin{pmatrix} 1 \\ 1 \end{pmatrix}$。测量 $\hat{S}_z$ 得到 $+\hbar/2$ 和 $-\hbar/2$ 的概率？
+
+**(b)** 电子处于态 $\chi = \frac{1}{\sqrt{5}}\begin{pmatrix} 1 \\ 2i \end{pmatrix}$，计算 $\langle\hat{S}_x\rangle$、$\langle\hat{S}_y\rangle$、$\langle\hat{S}_z\rangle$。
+
+**(c)** 对(b)验证 $\langle\hat{S}_x\rangle^2 + \langle\hat{S}_y\rangle^2 + \langle\hat{S}_z\rangle^2 \le \langle\hat{S}^2\rangle$。
+
+---
+
+### 4.4.4 物理应用
+
+#### 磁场中的哈密顿量
+
+$$\boxed{\hat{H} = -\boldsymbol{\mu}_S\cdot\mathbf{B} = \frac{e}{m_e}\hat{\mathbf{S}}\cdot\mathbf{B}}$$
+
+#### 拉莫尔进动
+
+均匀磁场 $\mathbf{B} = B_0\hat{z}$，拉莫尔频率 $\omega_0 = eB_0/m_e$：
+
+$$\boxed{\langle\hat{\mathbf{S}}\rangle(t) = \frac{\hbar}{2}\Big(\sin\theta_0\cos(\phi_0 + \omega_0 t),\;\sin\theta_0\sin(\phi_0 + \omega_0 t),\;\cos\theta_0\Big)}$$
+
+#### Stern-Gerlach 实验
+
+不均匀磁场将银原子束分裂成恰好两束，证实自旋存在与空间量子化。
+
+```mermaid
+flowchart LR
+    A["银原子束"] --> B["不均匀磁场"]
+    B --> C["ms = +1/2 向下偏转"]
+    B --> D["ms = -1/2 向上偏转"]
+    C --> E["两个分立斑点"]
+    D --> E
+```
+
+---
+
+### 习题 4.24
+
+**(计算练习)** 电子初始态 $|\!\uparrow\rangle$，磁场 $\mathbf{B} = B_0\hat{x}$。
+
+**(a)** 写出 $\hat{H}$ 的矩阵表示。
+**(b)** 求能量本征值和本征态。
+**(c)** 写出 $\chi(t)$。
+**(d)** 计算 $\langle\hat{S}_x\rangle(t)$、$\langle\hat{S}_y\rangle(t)$、$\langle\hat{S}_z\rangle(t)$。
+
+---
+
+### 习题 4.25（往年考题改编：旋转磁场中的自旋进动）
+
+电子在旋转磁场 $\mathbf{B}(t) = B_0[\cos(\omega t)\hat{x} + \sin(\omega t)\hat{y}]$ 中，初始态 $|\!\uparrow\rangle$。
+
+**(a)** 证明哈密顿量为 $\hat{H}(t) = \frac{\hbar\omega_0}{2}\begin{pmatrix} 0 & e^{-i\omega t} \\ e^{i\omega t} & 0 \end{pmatrix}$。
+
+**(b)** 写出耦合微分方程组。
+
+**(c)** 通过变量替换化为二阶方程。
+
+**(d)** 求解 $\alpha(t)$ 和 $\beta(t)$，定义 $\omega_r = \sqrt{\omega^2 + \omega_0^2}$。
+
+**(e)** 计算 $\langle S_z(t)\rangle = \frac{\hbar}{2}[1 - \frac{2\omega_0^2}{\omega_r^2}\sin^2\frac{\omega_r t}{2}]$。
+
+**(f)** 讨论 $\omega \to 0$ 和 $\omega = 0$ 极限。
+
+---
+
+### 4.4.5 角动量合成
+
+总角动量 $\hat{\mathbf{J}} = \hat{\mathbf{J}}_1 + \hat{\mathbf{J}}_2$，$j$ 的取值：
+
+$$\boxed{j = |j_1 - j_2|, \; |j_1 - j_2| + 1, \; \ldots, \; j_1 + j_2}$$
+
+#### 两个自旋 $1/2$ 的合成
+
+**三重态（$j = 1$，对称）**：
+
+$$\boxed{\begin{aligned} |1, 1\rangle &= |\!\uparrow\uparrow\rangle \\ |1, 0\rangle &= \frac{1}{\sqrt{2}}(|\!\uparrow\downarrow\rangle + |\!\downarrow\uparrow\rangle) \\ |1, -1\rangle &= |\!\downarrow\downarrow\rangle \end{aligned}}$$
+
+**单态（$j = 0$，反对称）**：
+
+$$\boxed{|0, 0\rangle = \frac{1}{\sqrt{2}}(|\!\uparrow\downarrow\rangle - |\!\downarrow\uparrow\rangle)}$$
+
+#### Clebsch-Gordan 系数
+
+$$|j, m\rangle = \sum_{m_1 + m_2 = m}\langle j_1, m_1; j_2, m_2|j, m\rangle\,|j_1, m_1; j_2, m_2\rangle$$
+
+性质：选择定则 $m = m_1 + m_2$，三角不等式，实数，正交完备。
+
+```mermaid
+flowchart TB
+    A["两个自旋-1/2 粒子<br/>4 维态空间"] --> B["j = 1: 三重态<br/>3 个态（对称）"]
+    A --> C["j = 0: 单态<br/>1 个态（反对称）"]
+```
+
+---
+
+### 习题 4.26
+
+**(计算练习)**
+
+**(a)** 验证单态满足 $\hat{J}^2|0,0\rangle = 0$ 和 $\hat{J}_z|0,0\rangle = 0$。
+
+**(b)** 对 $j_1 = 1, j_2 = 1/2$ 合成，写出 $j = 3/2$ 和 $j = 1/2$ 的所有耦合基态。
+
+**(c)** 验证 $|j=1/2, m=1/2\rangle$ 与 $|j=3/2, m=1/2\rangle$ 正交。
+
+---
+
+### 习题 4.27（思考题）
+
+**(a)** 对单态中粒子1测量 $\hat{S}_{1z}$ 得到 $+\hbar/2$ 的概率，以及此时粒子2的态。与EPR悖论的关系。
+
+**(b)** 证明单态中沿任意方向测量自旋分量的概率均为 $1/2$。
+
+**(c)** 三个自旋 $1/2$ 粒子的总角动量可取值？验证总态数为 $8$。
+
+---
+
+### 习题 4.28（编程题：自旋进动的可视化）
+
+**(a)** 均匀磁场中拉莫尔进动的 $\langle S_x\rangle, \langle S_y\rangle, \langle S_z\rangle$ 随时间变化。
+
+**(b)** 旋转磁场中不同 $\omega/\omega_0$ 的自旋翻转概率。
+
+**(c)** Bloch 球上的自旋轨迹。
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.integrate import solve_ivp
+from mpl_toolkits.mplot3d import Axes3D
+
+# 泡利矩阵（hbar = 1）
+sigma_x = np.array([[0, 1], [1, 0]], dtype=complex)
+sigma_y = np.array([[0, -1j], [1j, 0]], dtype=complex)
+sigma_z = np.array([[1, 0], [0, -1]], dtype=complex)
+
+def spin_expectation(chi):
+    """计算旋量 chi 的自旋期望值"""
+    chi = np.asarray(chi, dtype=complex)
+    Sx = np.real(chi.conj() @ sigma_x @ chi)
+    Sy = np.real(chi.conj() @ sigma_y @ chi)
+    Sz = np.real(chi.conj() @ sigma_z @ chi)
+    return 0.5 * Sx, 0.5 * Sy, 0.5 * Sz
+
+def schrodinger_rhs(t, psi_flat, H_func, *args):
+    """含时薛定谔方程右端项"""
+    alpha = psi_flat[0] + 1j * psi_flat[1]
+    beta = psi_flat[2] + 1j * psi_flat[3]
+    chi = np.array([alpha, beta])
+    H = H_func(t, *args)
+    dchi = -1j * H @ chi
+    return [dchi[0].real, dchi[0].imag, dchi[1].real, dchi[1].imag]
+
+# (a) 均匀磁场
+omega0 = 1.0
+T = 2 * np.pi / omega0
+t_eval = np.linspace(0, 4*T, 500)
+chi0 = np.array([1, 1], dtype=complex) / np.sqrt(2)  # 沿x向上
+y0 = [chi0[0].real, chi0[0].imag, chi0[1].real, chi0[1].imag]
+
+H_uniform = lambda t, w0: (w0/2) * sigma_z
+sol = solve_ivp(schrodinger_rhs, (0, 4*T), y0, t_eval=t_eval,
+                args=(H_uniform, omega0), rtol=1e-10, atol=1e-12)
+
+Sx, Sy, Sz = [], [], []
+for i in range(len(sol.t)):
+    a = sol.y[0,i] + 1j*sol.y[1,i]
+    b = sol.y[2,i] + 1j*sol.y[3,i]
+    sx, sy, sz = spin_expectation([a, b])
+    Sx.append(sx); Sy.append(sy); Sz.append(sz)
+
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.plot(sol.t/T, Sx, label=r'$\langle S_x \rangle$')
+ax.plot(sol.t/T, Sy, label=r'$\langle S_y \rangle$')
+ax.plot(sol.t/T, Sz, '--', label=r'$\langle S_z \rangle$')
+ax.set_xlabel(r'$t/T_{Larmor}$'); ax.set_ylabel(r'$\hbar/2$')
+ax.set_title('Larmor Precession'); ax.legend(); ax.grid(alpha=0.3)
+plt.savefig('larmor_precession.png', dpi=150)
+plt.show()
+
+# (b) 旋转磁场
+H_rot = lambda t, w0, w: (w0/2)*(np.cos(w*t)*sigma_x + np.sin(w*t)*sigma_y)
+y0_up = [1, 0, 0, 0]
+fig, ax = plt.subplots(figsize=(10, 5))
+for ratio in [0, 0.5, 1, 2, 5]:
+    wd = ratio * omega0
+    sol_b = solve_ivp(schrodinger_rhs, (0, 8*T), y0_up, t_eval=np.linspace(0,8*T,1000),
+                      args=(H_rot, omega0, wd), rtol=1e-10, atol=1e-12)
+    P_down = sol_b.y[2,:]**2 + sol_b.y[3,:]**2
+    ax.plot(sol_b.t/T, P_down, label=rf'$\omega/\omega_0={ratio}$')
+ax.set_xlabel(r'$t/T_{Larmor}$'); ax.set_ylabel(r'$P_\downarrow$')
+ax.set_title('Spin Flip in Rotating Field'); ax.legend(); ax.grid(alpha=0.3)
+plt.savefig('rotating_field_flip.png', dpi=150)
+plt.show()
+```
+
+---
+
+> **Key Takeaway（4.4 节）**
+
+| 主题 | 核心内容 | 关键公式/结论 |
+|------|---------|-------------|
+| 自旋引入 | 内禀角动量，满足同样的对易关系 | $[\hat{S}_i, \hat{S}_j] = i\hbar\epsilon_{ijk}\hat{S}_k$ |
+| 自旋 $1/2$ | 二维态空间，旋量表示 | $\chi = \binom{a}{b}$，$\|a\|^2 + \|b\|^2 = 1$ |
+| 泡利矩阵 | $\hat{S}_i = \frac{\hbar}{2}\sigma_i$ | $\sigma_i\sigma_j = \delta_{ij}\mathbf{I} + i\epsilon_{ijk}\sigma_k$ |
+| 任意方向测量 | 本征值恒为 $\pm\hbar/2$ | $\chi_+^{(n)} = (\cos\frac{\theta}{2}, e^{i\phi}\sin\frac{\theta}{2})^T$ |
+| 拉莫尔进动 | 自旋绕磁场方向进动 | $\omega_0 = eB_0/m_e$ |
+| Stern-Gerlach | 证实自旋与空间量子化 | 银原子束分裂为两束 |
+| 角动量合成 | $j = \|j_1-j_2\|, \ldots, j_1+j_2$ | $\frac{1}{2}\otimes\frac{1}{2} = 0 \oplus 1$ |
+| 三重态与单态 | 对称/反对称 | CG 系数：$m = m_1 + m_2$ |
+
+---
