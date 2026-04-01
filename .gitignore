@@ -7,3 +7,5 @@
 *.pdf
 
 .mcp.json
+
+.clawignore
