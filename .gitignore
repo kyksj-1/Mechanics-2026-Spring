@@ -7,3 +7,7 @@
 *.pdf
 
 .mcp.json
+
+.clawignore
+
+CLAUDE.md
