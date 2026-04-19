@@ -1,10 +1,5 @@
 # 计算物理作业五：TSSP方法求解GP方程与堆上的最短路径
 
-**作者：kyksj-1**
-
-**专家视角：Erwin Schrödinger（薛定谔）** —— 选择薛定谔作为专家视角的原因：本次作业的核心是求解含时Gross-Pitaevskii方程，这是非线性薛定谔方程的一种形式。薛定谔方程是量子力学的基石，薛定谔本人对波函数的物理解释、线性叠加原理有深刻见解。采用他的视角有助于深入理解波函数的演化行为、密度分布的物理意义，以及非线性项对量子系统的影响。
-
----
 
 ## 目录
 
@@ -262,6 +257,3 @@ python heap_shortest_path.py
 
 2. Taha, T. R., & Ablowitz, M. J. (1984). Analytical and numerical aspects of certain nonlinear evolution equations. *Journal of Computational Physics*, 55(2), 203-230.
 
----
-
-*报告生成时间：2026-04-19*
