@@ -9,3 +9,8 @@
 .mcp.json
 
 .clawignore
+
+__pycache__/
+*.pyc
+*.nbc
+*.nbi
