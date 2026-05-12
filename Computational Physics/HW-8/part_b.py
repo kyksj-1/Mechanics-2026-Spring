@@ -54,6 +54,14 @@ def fit_power_law(ts: np.ndarray, ys: np.ndarray) -> tuple[float, float]:
     return a, b
 
 
+def sparse_log_indices(mask: np.ndarray, n_points: int = 14) -> np.ndarray:
+    idx = np.flatnonzero(mask)
+    if len(idx) <= n_points:
+        return idx
+    chosen = np.unique(np.geomspace(1, len(idx), n_points).astype(int) - 1)
+    return idx[chosen]
+
+
 def main() -> None:
     # L=16 energy relaxation
     steps16 = 1200
@@ -97,7 +105,8 @@ def main() -> None:
         t = np.arange(1, steps + 1)
         d = delta[1:]
 
-        mask = (t >= 150) & (t <= 1200) & (d > 0)
+        reliable = (d > 2.0 * delta_err[1:]) & (d > 0)
+        mask = (t >= 10) & (t <= 150) & reliable
         slope, intercept = fit_power_law(t[mask], d[mask])
 
         all_data[str(L)] = {
@@ -108,12 +117,23 @@ def main() -> None:
             "delta_err_t": delta_err.tolist(),
         }
 
-        plt.loglog(t, d, label=f"L={L}, slope={slope:.3f}")
-        plt.fill_between(t, np.maximum(d - delta_err[1:], 1e-12), d + delta_err[1:], alpha=0.12, linewidth=0)
+        plt.loglog(t[reliable], d[reliable], lw=1.5, label=f"L={L}")
+        err_idx = sparse_log_indices(reliable)
+        yerr_low = np.minimum(delta_err[1:][err_idx], 0.8 * d[err_idx])
+        yerr_high = delta_err[1:][err_idx]
+        plt.errorbar(
+            t[err_idx],
+            d[err_idx],
+            yerr=np.vstack([yerr_low, yerr_high]),
+            fmt="none",
+            capsize=2,
+            alpha=0.45,
+        )
 
     plt.xlabel("t (MCS)")
     plt.ylabel(r"$\Delta(t)=|\langle E(t)\rangle/N-\langle E(\infty)\rangle/N|$")
     plt.title("Long-time relaxation at $T=T_c$")
+    plt.ylim(1e-2, 1.0)
     plt.grid(alpha=0.3, which="both")
     plt.legend()
     plt.tight_layout()
