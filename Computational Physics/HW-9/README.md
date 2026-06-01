@@ -1,7 +1,5 @@
 # 计算物理 HW-9：横场 Ising 模型的对角化与时间演化
 
-> **角色扮演**：本作业以 **Subir Sachdev** 视角撰写。
-> 选择理由：Sachdev 在《Quantum Phase Transitions》中将横场 Ising 链确立为量子相变的"氢原子"——它既有自由 Majorana 费米子的严格解，又同时包含序参量、对称性破缺、量子临界点与动力学等所有概念。本作业的 L=12 精确对角化、quench 动力学、Néel 态 fidelity 三个任务正好覆盖该模型的静态谱、低能动力学与多体回响（Loschmidt echo）三大问题层面，与 Sachdev 的研究路径高度契合。
 
 ---
 
@@ -127,7 +125,7 @@ t =  10.00:  || ana - num ||_F = 5.579e-16,  unitarity err = 2.487e-16
 
 $$H = -J\sum_{i=1}^{L}\sigma_i^z \sigma_{i+1}^z - h\sum_{i=1}^L \sigma_i^x,\qquad \sigma_{L+1}^z\equiv \sigma_1^z,\qquad J=1.$$
 
-> **Sachdev 视角的物理图像**
+> **物理图像**
 > 取 $J=1$ 后只剩一个参数 $h$。$h \to 0$ 时系统呈两重简并的铁磁基态 $|\uparrow\cdots\uparrow\rangle,\ |\downarrow\cdots\downarrow\rangle$（$Z_2$ 自发破缺）；$h\to\infty$ 时系统进入顺磁基态 $\bigotimes_i |+\rangle$，所有 $\sigma_i^x \to +1$。
 > 热力学极限下在 $h_c = J = 1$ 处存在 **二阶量子相变**，临界指数 $\nu=1$、$z=1$、动力学指数与 (1+1)D 自由 Majorana CFT 一致。
 > 有限 $L$ 时序参量被 $\mathbb{Z}_2$ 对称性精确禁锢，但 **基态与第一激发态的能隙** $\Delta = E_1 - E_0$ 在 $h\ll 1$ 区接近 $0$（与铁磁双井隧穿幅成比例，$\Delta \sim h^L$），在 $h\gg 1$ 区接近 $2h$ （单粒子激发），临界附近以 $\Delta \sim 1/L$ 软化。下面 B.1 的数值结果将直接显化这一图像。
@@ -233,7 +231,7 @@ RK4 (dt_max=0.005) 演化耗时: 2.965 s
 
 上图给出 $\langle\sigma_1^x(t)\rangle$ 的完整波形（蓝实线 = 精确，红虚线 = RK4），下图为逐点 $|exact - RK4|$。
 
-#### 物理解读（Sachdev 视角）
+#### 物理解读
 
 - $t=0$：$\langle\sigma_1^x\rangle = 0.2587$，与 B.1 一致。
 - $t>0$ 后，初态 $|\psi_0\rangle$ 不再是 $H_f$ 的本征态，分解为 $H_f$ 多体本征基中众多分量的相干叠加，$\langle\sigma_1^x\rangle$ 出现复杂振荡，在 $t \in [1,3]$ 内迅速上升到 $\sim 0.4$，然后围绕 $\sim 0.4$ 振荡。
@@ -318,7 +316,7 @@ Part B.3: L=18, J=1.0, h=1.0  (dim = 262144)
 
 ---
 
-## 附录：与无穷大极限的解析对照（Sachdev 视角的延伸）
+## 附录：与无穷大极限的解析对照
 
 横场 Ising 链通过 Jordan–Wigner 变换可映射为自由 Majorana 费米子模型，单粒子色散为
 
